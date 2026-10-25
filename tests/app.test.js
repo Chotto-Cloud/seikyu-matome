@@ -636,7 +636,7 @@ test("デモ版: 注意書き、読み取り専用の欄、振込先の固定、
   const app = makeApp();
   assert.equal(app.els["demoBanner"].hidden, false);
   for (const id of ["client", "service", "bank"]) assert.equal(app.els[id].readOnly, true, id);
-  assert.match(html, /これはデモ版です。取引先・サービスは決まったダミーから選ぶだけです。実際に使うときは、実用版のファイルを保存して、自分のPCで開いてください/);
+  assert.match(html, /これはデモ版です。取引先・サービスは決まったダミーから選ぶだけです。自分の仕事で使いたいときは、作り方一式で自分用に作ってください/);
   // 保存されていた振込先が別でも、固定のものになる
   app.storage[CK] = JSON.stringify({ clients: {}, prices: {}, bank: "他の銀行", subject: "{y}年{m}月分 業務委託料" });
   app.run("loadState()"); assert.equal(app.run("cfg.bank"), BANK);
