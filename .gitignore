@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+# 自分の控えやCSVを間違えて入れないため
+*.json
+明細_*.csv
+取引先_*.csv
+品目_*.csv
+請求まとめ_控え_*.json
+!sample/明細_見本_A社.csv

@@ -1,0 +1,2004 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; form-action 'none'; base-uri 'none'">
+<title>請求まとめ(試作品)</title>
+<style>
+/* デザインの型 tokens.css  (2026-10-20) をもとに、新しい画面「C+B」(2026-10-21)の色を足したもの
+   色の値は check-contrast.js が読み取って差(コントラスト)を測ります。
+   値を変えたら node ../デザインの型/check-contrast.js index.html を必ず実行してください。 */
+
+/* ===== 色:ライト(既定) ===== */
+/*LIGHT-START*/
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #F3F5F4;
+  --text: #1B1F1D;
+  --text-sub: #4A524E;
+  --border: #6B7570;
+  --border-sub: #D5DAD7;
+  --primary: #1F7A4D;
+  --primary-hover: #186240;
+  --primary-active: #124D32;
+  --link-strong: #124D32;
+  --on-primary: #FFFFFF;
+  --primary-soft: #E6F3EC;
+  --primary-soft-active: #D0E8DA;
+  --danger: #B3261E;
+  --danger-soft: #FCEBEA;
+  --danger-soft-active: #F7D3D0;
+  --success: #1B6E3C;
+  --success-soft: #E6F3EC;
+  --warning: #8A5A00;
+  --warning-soft: #FFF4DC;
+  --focus: #0B57D0;
+  --out: #EAF5EE;
+  --out-line: #3E8A5F;
+  --toast-btn: #9AE8BA;
+  --toast-hover: #2F3532;
+  --c1: #3B4CCA;
+  --c2: #B35A00;
+  --c3: #8E3B8E;
+  --c4: #1F6F8B;
+  --scrim: rgba(27, 31, 29, .45);
+}
+/*LIGHT-END*/
+
+/* ===== 色:ダーク(端末の設定に合わせる) ===== */
+/*DARK-MEDIA-START*/
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111318;
+    --surface: #1B1E26;
+    --surface-2: #252A35;
+    --text: #EEF0F5;
+    --text-sub: #B4BBC8;
+    --border: #8A938E;
+    --border-sub: #3A4050;
+    --primary: #C8F25A;
+    --primary-hover: #B5DF47;
+    --primary-active: #A3CC35;
+    --link-strong: #E2FA9E;
+    --on-primary: #111318;
+    --primary-soft: #22281A;
+    --primary-soft-active: #2E3820;
+    --danger: #FF8A80;
+    --danger-soft: #3A1F1E;
+    --danger-soft-active: #4F2A28;
+    --success: #6FD398;
+    --success-soft: #1F3A2A;
+    --warning: #F2B84B;
+    --warning-soft: #3A2E12;
+    --focus: #7FB8FF;
+    --out: #161A12;
+    --out-line: #6E9A2E;
+    --toast-btn: #1A4B00;
+    --toast-hover: #DDE2EA;
+    --c1: #9DB4FF;
+    --c2: #FFB870;
+    --c3: #E3A6F0;
+    --c4: #7FD3E6;
+    --scrim: rgba(5, 6, 9, .72);
+  }
+}
+/*DARK-MEDIA-END*/
+
+/* ===== 色:ダーク(ページ側で強制する場合) ===== */
+/*DARK-START*/
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111318;
+  --surface: #1B1E26;
+  --surface-2: #252A35;
+  --text: #EEF0F5;
+  --text-sub: #B4BBC8;
+  --border: #8A938E;
+  --border-sub: #3A4050;
+  --primary: #C8F25A;
+  --primary-hover: #B5DF47;
+  --primary-active: #A3CC35;
+  --link-strong: #E2FA9E;
+  --on-primary: #111318;
+  --primary-soft: #22281A;
+  --primary-soft-active: #2E3820;
+  --danger: #FF8A80;
+  --danger-soft: #3A1F1E;
+  --danger-soft-active: #4F2A28;
+  --success: #6FD398;
+  --success-soft: #1F3A2A;
+  --warning: #F2B84B;
+  --warning-soft: #3A2E12;
+  --focus: #7FB8FF;
+  --out: #161A12;
+  --out-line: #6E9A2E;
+  --toast-btn: #1A4B00;
+  --toast-hover: #DDE2EA;
+  --c1: #9DB4FF;
+  --c2: #FFB870;
+  --c3: #E3A6F0;
+  --c4: #7FD3E6;
+  --scrim: rgba(5, 6, 9, .72);
+}
+/*DARK-END*/
+
+/* ===== 文字・余白・角丸・幅 ===== */
+:root {
+  --font: "Yu Gothic UI", "Hiragino Sans", "Meiryo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fs-body: 16px;
+  --fs-sub: 14px;
+  --fs-h1: 20px;
+  --fs-h2: 18px;
+  --fs-h3: 16px;
+  --lh: 1.6;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --max-w: 1100px;
+  --page-pad: 16px;
+  --tap: 44px;
+  --tap-sm: 36px;
+  --t: 100ms;
+}
+@media (max-width: 599px) {
+  :root { --page-pad: 8px; }
+}
+
+/* ===== 土台 ===== */
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: var(--lh);
+}
+h1, h2, h3 { margin: 0 0 var(--sp-3); font-weight: 700; line-height: 1.4; }
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+p { margin: 0 0 var(--sp-3); }
+a { color: var(--primary); text-underline-offset: 3px; }
+a:hover { color: var(--primary-hover); }
+a:active { color: var(--primary-active); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sub, .hint { color: var(--text-sub); font-size: var(--fs-sub); }
+.row { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+
+/* ===== ボタン ===== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: var(--tap); min-width: 96px; padding: 0 var(--sp-4);
+  border: 2px solid transparent; border-radius: var(--radius);
+  font: inherit; font-weight: 700; line-height: 1.2; text-decoration: none;
+  cursor: pointer; background: transparent; color: var(--text);
+  transition: background-color var(--t), border-color var(--t), color var(--t), transform var(--t);
+}
+.btn-sm { min-height: var(--tap-sm); min-width: 72px; padding: 0 var(--sp-3); font-size: var(--fs-sub); }
+
+.btn-primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.btn-primary:hover, .btn-primary.is-hover { background: var(--primary-hover); border-color: var(--primary-hover); text-decoration: underline; }
+.btn-primary:active, .btn-primary.is-active { background: var(--primary-active); border-color: var(--primary-active); transform: translateY(1px); }
+
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover, .btn-secondary.is-hover { background: var(--primary-soft); text-decoration: underline; }
+.btn-secondary:active, .btn-secondary.is-active { background: var(--primary-soft-active); transform: translateY(1px); }
+
+.btn-danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover, .btn-danger.is-hover { background: var(--danger-soft); text-decoration: underline; }
+.btn-danger:active, .btn-danger.is-active { background: var(--danger-soft-active); transform: translateY(1px); }
+
+.btn-text { background: transparent; color: var(--primary); border-color: transparent; min-width: 0; }
+.btn-text:hover, .btn-text.is-hover { color: var(--link-strong); background: var(--primary-soft); text-decoration: underline; }
+.btn-text:active, .btn-text.is-active { color: var(--link-strong); background: var(--primary-soft-active); transform: translateY(1px); }
+
+/* キーボードで選んだ時:カーソル(色の変化)とは別の、太い外側の輪 */
+a.btn:hover, a.btn:active { color: var(--text); }
+.btn:focus-visible, .btn.is-focus { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; text-decoration: none; transform: none; }
+.btn-primary[disabled]:hover, .btn-primary[aria-disabled="true"]:hover { background: var(--primary); border-color: var(--primary); text-decoration: none; }
+.btn-secondary[disabled]:hover, .btn-secondary[aria-disabled="true"]:hover { background: var(--surface); text-decoration: none; }
+.btn-danger[disabled]:hover, .btn-danger[aria-disabled="true"]:hover { background: var(--surface); text-decoration: none; }
+.btn-text[disabled]:hover, .btn-text[aria-disabled="true"]:hover { background: transparent; text-decoration: none; }
+.reason { display: block; margin-top: var(--sp-1); color: var(--text-sub); font-size: var(--fs-sub); }
+
+/* 並べ方 */
+.actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.actions-split { justify-content: space-between; }
+.actions-end { justify-content: flex-end; }
+@media (max-width: 599px) {
+  .actions-stack { flex-direction: column-reverse; align-items: stretch; }
+  .actions-stack .btn { width: 100%; }
+}
+
+/* ===== 別窓(dialog) ===== */
+dialog {
+  width: min(520px, calc(100% - 2 * var(--sp-4)));
+  padding: var(--sp-5); border: 1px solid var(--border-sub); border-radius: var(--radius-lg);
+  background: var(--surface); color: var(--text);
+}
+dialog::backdrop { background: var(--scrim); }
+dialog h2 { margin-bottom: var(--sp-3); }
+dialog .actions { margin-top: var(--sp-5); }
+
+/* ===== お知らせ(色だけに頼らず、先頭に文字のラベル) ===== */
+.notice { padding: var(--sp-3) var(--sp-4); border: 2px solid; border-radius: var(--radius); color: var(--text); }
+.notice::before { font-weight: 700; margin-right: var(--sp-2); }
+.notice-success { background: var(--success-soft); border-color: var(--success); }
+.notice-success::before { content: "完了:"; color: var(--success); }
+.notice-warning { background: var(--warning-soft); border-color: var(--warning); }
+.notice-warning::before { content: "注意:"; color: var(--warning); }
+.notice-error { background: var(--danger-soft); border-color: var(--danger); }
+.notice-error::before { content: "エラー:"; color: var(--danger); }
+
+/* ===== テーマ切り替え ===== */
+.theme-toggle { display: inline-flex; gap: var(--sp-1); align-items: center; flex-wrap: wrap; font-size: var(--fs-sub); }
+.theme-toggle .btn[aria-pressed="true"] { background: var(--primary-soft-active); border-color: var(--primary); }
+
+/* ===== このアプリ用の調整(デザインの型の色・余白の名前を使う) ===== */
+[hidden]{display:none !important}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+body{padding-bottom:104px}
+#nojs{margin:var(--sp-2)}
+.page{max-width:var(--max-w);margin:0 auto;padding:var(--sp-5) var(--page-pad);display:flex;flex-direction:column;gap:var(--sp-5)}
+.page>*{min-width:0}
+section{scroll-margin-top:var(--sp-4)}
+.panel,#guide{background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--radius-lg);padding:var(--sp-5)}
+.panel>h2,#guide>h2{margin-bottom:var(--sp-3)}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-1) var(--sp-3);margin-bottom:var(--sp-3)}
+.sechead h2{margin:0}
+.sechead .sub{margin:0}
+.notices>*:last-child{margin-bottom:0}
+.kicker{font-size:var(--fs-sub);letter-spacing:.06em;color:var(--text-sub);font-weight:700}
+.steps{list-style:none;counter-reset:s;padding:0}
+.steps li{counter-increment:s;position:relative;padding-left:40px;min-height:28px;margin-bottom:var(--sp-2)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:700;font-size:var(--fs-sub)}
+
+/* 頭(年月・合計・メニュー) */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--sp-5)}
+.top-l{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--sp-4)}
+.top-title{display:flex;flex-direction:column;gap:var(--sp-1)}
+.top h1{margin:0;font-weight:900;line-height:1;letter-spacing:-.02em;font-size:inherit}
+.yr{display:block;font-size:var(--fs-h1);font-weight:700;margin-bottom:var(--sp-1)}
+.mn{font-size:56px}
+.mu{font-size:24px;font-weight:700;margin-left:var(--sp-1)}
+.mnav{display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center;padding-bottom:var(--sp-1)}
+.mnav input[type=month]{min-height:var(--tap-sm);width:10em;padding:0 var(--sp-2);font-size:var(--fs-sub)}
+.top-r{display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3);margin-left:auto}
+.sums{display:flex;flex-wrap:wrap;gap:var(--sp-6);margin:0}
+.sums dd{margin:0;font-size:28px;font-weight:900;line-height:1.3}
+.sums .plan{color:var(--text-sub)}
+.topnav{display:flex;flex-wrap:wrap;gap:var(--sp-2);justify-content:flex-end}
+@media (max-width:767px){.top-r{align-items:flex-start;margin-left:0}.topnav{justify-content:flex-start}}
+
+/* 記録を入れる */
+.enter{background:var(--surface);border:1px solid var(--border-sub);border-radius:16px;padding:var(--sp-4) 20px;display:flex;flex-direction:column;gap:var(--sp-3)}
+.enter-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--sp-2)}
+.enter-head h2{margin:0}
+.seg{display:inline-flex;gap:var(--sp-1);padding:var(--sp-1);border-radius:var(--radius-lg);background:var(--surface-2)}
+.seg button{min-height:var(--tap-sm);padding:0 14px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;font:inherit;font-size:var(--fs-sub);color:var(--text);cursor:pointer}
+.seg button:hover{text-decoration:underline}
+.seg button[aria-pressed="true"]{background:var(--surface);font-weight:700;box-shadow:0 0 0 2px var(--primary)}
+.editing{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-3);border-radius:10px;background:var(--primary-soft);border:2px solid var(--primary);font-size:var(--fs-sub)}
+.enter-form{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:flex-start;margin:0}
+.enter-main{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.enter-side{flex:0 1 240px;display:flex;flex-direction:column;gap:6px}
+.enter-side .btn{width:100%}
+#submitBtn{min-height:52px}
+.enter input.cmd{width:100%;min-height:52px;padding:0 var(--sp-4);font-size:18px}
+.qread{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:32px;font-size:var(--fs-sub)}
+.chip-ok{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sub);padding:2px 10px;border-radius:999px;background:var(--surface-2);border:2px solid transparent}
+.chip-miss{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sub);padding:2px 10px;border-radius:999px;background:var(--danger-soft);border:2px dashed var(--danger);color:var(--danger);font-weight:700}
+.picks{display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center}
+.picks-in{display:contents}
+.pick{display:inline-flex;align-items:center;gap:6px;min-height:var(--tap-sm);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit;font-size:var(--fs-sub);cursor:pointer}
+.pick:hover{background:var(--surface-2);text-decoration:underline}
+.fgrid{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:flex-end}
+#fmsg{margin:0}
+.enter-main:has(#lineBox:not([hidden])) #fmsg{min-height:1.6em}
+#pickHelp{margin:0}
+#fmsg.err{color:var(--danger);font-weight:700}
+.howto summary{min-height:32px;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:3px}
+.howto ul{margin:var(--sp-2) 0 0;padding-left:20px;display:flex;flex-direction:column;gap:var(--sp-1)}
+
+/* 流れ・板(予定 / 実績 / 書き出す) */
+.legend{display:flex;flex-wrap:wrap;gap:var(--sp-4);align-items:center;font-size:var(--fs-sub);color:var(--text-sub);margin:0 0 var(--sp-3)}
+.legend strong{color:var(--text)}
+.sw{display:inline-block;width:22px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--sp-4);align-items:start}
+.col{background:var(--surface);border:1px solid var(--border-sub);border-radius:var(--radius-lg);padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3);min-width:0}
+.col p{margin:0}
+.col-out{background:var(--out);border:2px solid var(--out-line)}
+.colh{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-2);min-height:var(--tap-sm)}
+.colh h2{margin:0}
+.cnt{color:var(--text-sub)}
+.cards{display:flex;flex-direction:column;gap:var(--sp-3)}
+.card{background:var(--surface-2);border:2px solid transparent;border-radius:var(--radius-lg);padding:var(--sp-3) 14px;display:flex;flex-direction:column;gap:var(--sp-1)}
+.card-plan{background:var(--surface);border:2px dashed var(--border)}
+.cname{font-size:17px;display:flex;align-items:center;gap:var(--sp-2)}
+.cdetail{font-size:15px;color:var(--text-sub)}
+.cfoot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--sp-2);margin-top:var(--sp-1)}
+.cfoot .grp{display:flex;gap:var(--sp-1)}
+.btn-text-sm{min-height:var(--tap-sm);padding:0 10px;font-size:var(--fs-sub);text-decoration:underline;text-underline-offset:3px}
+.btn-text-del{color:var(--danger)}
+.btn-text-del:hover,.btn-text-del:active{color:var(--danger);background:var(--danger-soft)}
+.empty{padding:20px var(--sp-3);text-align:center;color:var(--text-sub);font-size:var(--fs-sub);border:2px dashed var(--border-sub);border-radius:var(--radius-lg);margin:0}
+.who{display:inline-block;width:10px;height:10px;border-radius:50%;flex:0 0 10px;background:var(--text-sub)}
+.who.c1{background:var(--c1)}.who.c2{background:var(--c2)}.who.c3{background:var(--c3)}.who.c4{background:var(--c4)}
+.bill{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2);padding:10px 0;border-bottom:1px solid var(--out-line)}
+.bill .nm{display:flex;align-items:center;gap:var(--sp-2)}
+.bill .amt{text-align:right}
+.bill .amt strong{font-variant-numeric:tabular-nums}
+.bill .amt .sub{display:block}
+.btn-block{width:100%}
+.reason-strong{font-size:var(--fs-sub);font-weight:700;color:var(--text)}
+.reason-err{font-size:var(--fs-sub);font-weight:700;color:var(--danger)}
+
+/* お知らせの帯 */
+.toast{position:fixed;left:50%;bottom:var(--sp-5);transform:translateX(-50%);background:var(--text);color:var(--bg);border-radius:var(--radius-lg);padding:var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);display:flex;align-items:center;gap:var(--sp-2);box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:calc(100% - 32px);z-index:5}
+.toast .btn{color:var(--toast-btn);min-height:var(--tap-sm);min-width:0;padding:0 var(--sp-3)}
+.toast .btn:hover{background:var(--toast-hover);text-decoration:underline}
+.toast :focus-visible{outline-color:var(--bg)}
+
+/* カレンダーの別窓 */
+#dlgCal{width:min(1080px,96vw)}
+#dlgDel{width:min(480px,94vw)}
+.calhead{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-4)}
+.calhead h2{margin:0;font-size:22px;font-weight:900}
+.calnav{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.calleg{display:flex;gap:var(--sp-4);align-items:center;flex-wrap:wrap;font-size:var(--fs-sub);color:var(--text-sub)}
+.calleg>span,.calleg .lg{display:flex;align-items:center;gap:6px}
+#calLegend{flex-wrap:wrap;gap:var(--sp-3)}
+.calbody{display:flex;flex-wrap:wrap;gap:var(--sp-4);align-items:flex-start}
+.calwrap{flex:999 1 640px;min-width:0;overflow-x:auto}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--sp-1);min-width:640px}
+.wk{font-size:var(--fs-sub);font-weight:700;color:var(--text-sub);text-align:center;padding:var(--sp-1) 0}
+.cell{min-height:96px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-1);text-align:left;font:inherit;color:inherit;cursor:pointer}
+.cell:hover{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--border)}
+.c-blank{min-height:96px}
+.c-today .dnum{background:var(--text);color:var(--bg);border-radius:999px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center}
+.cell.c-sel{border-color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary);background:var(--primary-soft)}
+.dnum{font-size:var(--fs-sub);font-weight:700;color:var(--text-sub)}
+.cchip{display:flex;align-items:center;gap:var(--sp-1);font-size:13px;line-height:1.35;padding:3px 6px;border-radius:6px;background:var(--surface);color:var(--text)}
+.cchip-plan{background:transparent;border:2px dashed var(--border)}
+.calside{flex:1 1 260px;min-width:0;background:var(--surface-2);border-radius:14px;padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3)}
+.calside h3{margin:0;font-size:var(--fs-h2)}
+.calrow{display:flex;flex-direction:column;gap:2px;padding-bottom:var(--sp-2);border-bottom:1px solid var(--border-sub)}
+.calrow strong{display:flex;align-items:center;gap:var(--sp-2)}
+.calside p{margin:0}
+
+.formbtns{display:flex;gap:var(--sp-2);margin-left:auto;flex:none}
+#f input,#f select{min-width:0}
+.subcard{border:1px solid var(--border-sub);border-radius:var(--radius-lg);padding:var(--sp-4);margin:var(--sp-3) 0;background:var(--surface)}
+.subcard .colhead{margin-top:0;align-items:flex-start}
+.colhead .sub{margin:0}
+.colhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--sp-2);margin:var(--sp-3) 0 var(--sp-2)}
+.colhead h3{margin:0}
+.note{color:var(--text-sub);font-size:var(--fs-sub);margin:0 0 var(--sp-2)}
+h3{margin:var(--sp-4) 0 var(--sp-2)}
+label{display:flex;flex-direction:column;gap:var(--sp-1);font-size:var(--fs-sub);font-weight:700;color:var(--text)}
+input:not([type=checkbox]),select,textarea{
+  min-height:var(--tap);padding:var(--sp-2) var(--sp-3);font:inherit;font-weight:400;color:var(--text);background:var(--surface);
+  border:2px solid var(--border);border-radius:var(--radius);transition:border-color var(--t),background-color var(--t)}
+input:not([type=checkbox]):hover,select:hover,textarea:hover{background:var(--surface-2)}
+input:not([type=checkbox]):focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px;background:var(--surface)}
+input[aria-invalid="true"]{border-color:var(--danger)}
+input::placeholder,textarea::placeholder{color:var(--text-sub)}
+input:disabled,select:disabled,textarea:disabled{opacity:.6;cursor:not-allowed}
+input[type=checkbox]{width:24px;height:24px;min-height:0;accent-color:var(--primary);cursor:pointer}
+textarea{width:100%;min-height:170px;font-family:ui-monospace,Consolas,monospace;font-size:var(--fs-sub)}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-body)}
+th,td{text-align:left;padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--border-sub);vertical-align:middle}
+th{font-size:var(--fs-sub);font-weight:700;background:var(--surface-2);color:var(--text);border-bottom:2px solid var(--border)}
+td.n,th.n{text-align:right}
+tr:hover td{background:var(--primary-soft)}
+td select{min-width:9em;text-overflow:clip}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border-sub);border-radius:var(--radius-lg);background:var(--surface)}
+.scroll table{min-width:480px}
+.scroll td:first-child{white-space:nowrap;min-width:6em}
+.scroll td button{white-space:nowrap}
+td button+button{margin-left:var(--sp-2)}
+.warn{list-style:none;margin:var(--sp-2) 0;padding:0;display:grid;gap:var(--sp-1);font-size:var(--fs-sub)}
+.warn li{padding:var(--sp-2) var(--sp-3);border:2px solid var(--warning);border-radius:var(--radius);background:var(--warning-soft);color:var(--text)}
+.warn li::before{content:"注意:";font-weight:700;color:var(--warning);margin-right:var(--sp-2)}
+.warn li[data-lv="block"]{border-color:var(--danger);background:var(--danger-soft)}
+.warn li[data-lv="block"]::before{content:"エラー:";color:var(--danger)}
+.warn li.strong{font-weight:700}
+.badge{display:block;border-radius:var(--radius);margin:0 0 var(--sp-2);padding:var(--sp-2) var(--sp-3);border:1px solid var(--border-sub);background:var(--surface-2);color:var(--text);font-size:var(--fs-sub)}
+.badge.err{border:2px solid var(--danger);background:var(--danger-soft);font-weight:700}
+.badge.err::before{content:"エラー:";color:var(--danger);margin-right:var(--sp-2)}
+.combo{display:flex;gap:var(--sp-1)}
+.combo input{flex:1;min-width:120px}
+.combo select{width:96px;padding:var(--sp-2) var(--sp-1)}
+.step{font-size:var(--fs-sub);color:var(--text-sub);margin:var(--sp-1) 0}
+details{font-size:var(--fs-sub);color:var(--text-sub);margin:0 0 var(--sp-2)}
+summary{cursor:pointer;color:var(--primary);font-weight:700}
+.hint{margin:var(--sp-1) 0 0}
+#totals ul{margin:var(--sp-1) 0 0;padding-left:1.2em;font-size:var(--fs-sub)}
+dialog{max-height:90vh;overflow:auto;border:1px solid var(--border-sub);border-radius:var(--radius-lg);background:var(--surface);color:var(--text);width:min(560px,94vw);padding:var(--sp-5)}
+.dlgform{display:grid;gap:var(--sp-3);margin:var(--sp-2) 0}
+dialog h3{margin-top:0}
+dialog h4{margin:var(--sp-3) 0 var(--sp-1);font-size:var(--fs-sub);border-bottom:1px solid var(--border-sub);padding-bottom:var(--sp-1)}
+dialog .actions{margin-top:var(--sp-4)}
+.errline{color:var(--danger);font-size:var(--fs-sub);font-weight:700;margin:var(--sp-2) 0;min-height:1.2em}
+.errline:not(:empty)::before{content:"エラー:";margin-right:var(--sp-2)}
+.scroll th,.scroll td{white-space:nowrap}
+.scroll td{color:var(--text);font-weight:400}
+.scroll td .hint{white-space:nowrap;color:var(--text-sub)}
+.scroll td{padding-top:var(--sp-3);padding-bottom:var(--sp-3)}
+#f .combo input{min-width:12em}
+#f input[type=date]{min-width:11em}
+#f input[type=time]{min-width:8em}
+@media (max-width:480px){
+  .panel,#guide{padding:var(--sp-4)}
+  .row>label{flex:1 1 100%}
+  .row>.btn{flex:1 1 auto}
+  .mn{font-size:48px}
+  .cal{min-width:560px}
+}
+@media (max-width:599px){
+  .toast{left:var(--sp-2);right:var(--sp-2);transform:none;max-width:none;bottom:var(--sp-2)}
+  .toast #toastMsg{flex:1 1 auto}
+}
+</style>
+<script>
+// 画面の読み込み中に問題が起きたとき、何も出ないまま止まらないよう、赤い枠で知らせる(原因を伝えやすくするため)
+window.addEventListener("error",function(e){
+  try{
+    var d=document.getElementById("fatal");
+    if(!d){d=document.createElement("div");d.id="fatal";d.setAttribute("role","alert");
+      d.style.cssText="position:sticky;top:0;z-index:9;background:#fff0f0;color:#900;border:2px solid #c00;border-radius:8px;padding:10px 12px;margin:0 0 12px;font:14px/1.6 sans-serif";
+      (document.body||document.documentElement).insertBefore(d,(document.body||document.documentElement).firstChild)}
+    d.textContent="画面の読み込みで問題が起きました。この文をそのまま、作者(X: @chottofix)に伝えてください(個人情報は含まれません): "+String(e.message||e)+" / 行 "+(e.lineno||"?");
+  }catch(x){}
+});
+</script>
+</head>
+<body>
+<div id="nojs" role="alert" style="background:#fff7e0;color:#5a3d00;border:2px solid #d9a400;border-radius:8px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.6">このアプリのプログラムが、まだ動いていません。ボタンを押しても何も起きない場合は、このファイルを Chrome か Edge で開き直してください(エクスプローラーでファイルをダブルクリック)。Claude などのアプリの中のプレビュー画面では、動かないことがあります。</div>
+<div class="page">
+
+<div class="notices">
+<p class="badge">練習として作った、特定の請求書ソフトとは無関係の非公式な補助ツールです。無保証です。請求書の内容は、請求書にする前に、必ず自分で確認してください。</p>
+<p class="badge err" id="serr" role="alert" hidden></p>
+<p class="badge" id="demoBanner" hidden>これはデモ版です。取引先・サービスは決まったダミーから選ぶだけです。実際に使うときは、実用版のファイルを保存して、自分のPCで開いてください</p>
+</div>
+
+<header class="top">
+  <div class="top-l">
+    <div class="top-title">
+      <span class="kicker">請求まとめ ・ 練習作品</span>
+      <h1><span class="yr" id="yearLabel"></span><span class="mn" id="monthNum"></span><span class="mu">月</span><span class="sr">の記録</span></h1>
+    </div>
+    <div class="mnav">
+      <button type="button" class="btn btn-secondary btn-sm" id="prevMonth">‹ 前の月</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="nextMonth">次の月 ›</button>
+      <button type="button" class="btn btn-text btn-text-sm" id="thisMonthBtn" hidden>今月に戻る</button>
+      <input type="month" id="month" aria-label="月を選ぶ">
+    </div>
+  </div>
+  <div class="top-r">
+  <dl class="sums">
+    <div><dt class="kicker">実績</dt><dd id="sumAct">なし</dd></div>
+    <div><dt class="kicker">予定</dt><dd class="plan" id="sumPlan">なし</dd></div>
+  </dl>
+  <nav aria-label="メニュー" class="topnav">
+    <button type="button" class="btn btn-secondary" id="openCal" aria-haspopup="dialog"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>カレンダーで見る</button>
+    <a class="btn btn-secondary" href="#sec-settings">設定</a>
+    <a class="btn btn-secondary" href="#sec-backup">控え(バックアップ)</a>
+  </nav>
+  </div>
+</header>
+
+<section id="guide">
+  <h2>はじめての手順</h2>
+  <p class="note"><button class="btn btn-secondary btn-sm" id="loadSample" type="button">ダミーを入れて試す</button> を押して、流れを見ます。「3 書き出す」のCSVを保存して、中身を確かめます。<span id="clearNote">試したあとは、<button class="btn btn-danger btn-sm" id="clearDummy" type="button" aria-describedby="clearWhy">ダミーを消す</button> を押します(ダミーの行と、ダミーの設定だけが消えます)。</span></p>
+  <p class="reason" id="clearWhy" hidden></p>
+  <details>
+    <summary>元に戻す方法</summary>
+    <p>このアプリでは、カードの「削除」で行を消せます。消した直後や、まとめて直した直後なら、画面の下に出るお知らせの帯の「元に戻す」が使えます。「控え(バックアップ)」のファイルがあれば、そこから戻せます。</p>
+  </details>
+</section>
+
+<section id="sec-enter" class="enter" aria-labelledby="addTitle">
+  <div class="enter-head">
+    <h2 id="addTitle">記録を入れる</h2>
+    <div class="seg" role="group" aria-label="入れ方">
+      <button type="button" id="modeLine" aria-pressed="false">1行で入れる</button>
+      <button type="button" id="modeForm" aria-pressed="true">欄に分けて入れる</button>
+    </div>
+  </div>
+  <div class="editing" id="editing" role="status" hidden><strong id="editLabel"></strong><span>を直しています。直したら「直した内容で保存する」を押します。</span></div>
+  <form id="f" class="enter-form" novalidate>
+    <div class="enter-main">
+      <div id="lineBox" hidden>
+        <label for="q" class="sr">1行で入れる</label>
+        <input id="q" class="cmd" type="text" autocomplete="off" placeholder="例: 10/21 A 作業 9:00-11:00" aria-describedby="fmsg">
+        <div id="qRead" class="qread"></div>
+        <div class="picks"><span class="sub">押すと欄に入ります:</span><span class="picks-in" id="pickClients"></span><span class="picks-in" id="pickServices"></span></div>
+        <details class="howto">
+          <summary>くわしい入れ方</summary>
+          <ul class="sub">
+            <li>取引先とサービスは、頭の文字だけで分かります(例: 「A」で「A社」や「ダミーA社」、「作業」で「作業サービス」)。</li>
+            <li>初めての名前は、1行では入りません。「欄に分けて入れる」か、設定で登録します。</li>
+            <li>時間は「9:00-11:00」や「9-11」、または「1.5h」「1.5時間」と書きます。「回」のサービスは、回数なしで1回、「2回」と書くと2回です。</li>
+            <li>今日より後の日付は予定、今日までは実績になります。「予定」「実績」と書けば変えられます。</li>
+            <li>全角の数字のままでも読めます。</li>
+          </ul>
+        </details>
+      </div>
+      <div id="formBox">
+        <div class="fgrid">
+          <label>日付<input type="date" id="date" required></label>
+          <label>取引先<span class="combo"><input id="client" required autocomplete="off" placeholder="例: ダミーA社"><select id="clientPick" aria-label="取引先を選ぶ"></select></span></label>
+          <label>サービス<span class="combo"><input id="service" required autocomplete="off" placeholder="例: 作業サービス"><select id="servicePick" aria-label="サービスを選ぶ"></select></span></label>
+          <label><span id="qtyText">時間(h)</span><input type="number" id="hours" step="any" min="0" required style="width:90px" placeholder="1.5"></label>
+          <label id="tmStartL">開始(任意)<input type="time" id="tmStart" style="width:120px"></label>
+          <label id="tmEndL">終了(任意)<input type="time" id="tmEnd" style="width:120px"></label>
+          <label>種類<select id="kind"><option value="auto">日付で決める</option><option value="act">実績</option><option value="plan">予定</option></select></label>
+        </div>
+        <p class="note" id="pickHelp">取引先とサービスは、一度入れると、次から右の「▼ 選ぶ」に出ます(はじめは入力だけです)。「回」のサービスは、開始と終了がなくても入れられます。</p>
+      </div>
+      <p class="note" id="fmsg" aria-live="polite"></p>
+    </div>
+    <div class="enter-side">
+      <button type="submit" class="btn btn-primary" id="submitBtn">追加する</button>
+      <button type="button" class="btn btn-secondary" id="cancelEdit" hidden>直すのをやめる</button>
+    </div>
+  </form>
+</section>
+
+<div>
+  <p class="legend"><span><strong>月末までの流れ:</strong> 1 予定を実績にする → 2 実績を確かめる → 3 明細CSVを保存する</span><span><span class="sw" style="border:2px dashed var(--border)" aria-hidden="true"></span>点線のカード=予定</span><span><span class="sw" style="background:var(--surface-2);border:1px solid var(--border-sub)" aria-hidden="true"></span>塗りのカード=実績</span></p>
+  <div id="sec-list" class="board">
+    <section class="col" id="colPlan" aria-labelledby="planH">
+      <div class="colh"><h2 id="planH" tabindex="-1">1 予定 <span class="cnt" id="planCount">0件</span></h2><button type="button" class="btn btn-secondary btn-sm" id="bulkAct" hidden>0件とも実績にする</button></div>
+      <div class="cards" id="planList"></div>
+      <button type="button" class="btn btn-text btn-text-sm" id="copyPrev" aria-describedby="copyPrevWhy">前の月の行を、予定として写す</button>
+      <p class="reason" id="copyPrevWhy" hidden></p>
+    </section>
+    <section class="col" id="colAct" aria-labelledby="actH">
+      <div class="colh"><h2 id="actH" tabindex="-1">2 実績 <span class="cnt" id="actCount">0件</span></h2></div>
+      <div class="cards" id="actList"></div>
+    </section>
+    <section class="col col-out" id="colOut" aria-labelledby="outH">
+      <div class="colh"><h2 id="outH">3 書き出す</h2></div>
+      <p class="sub" id="outSummary"></p>
+      <div id="bills"></div>
+      <p class="sub" id="demoCsvNote" hidden>デモ版のCSVは、架空の取引先・架空の振込先だけで作ります。</p>
+      <p class="sub" id="outNote">金額の目安は、単価×数量です。税の表示や端数処理の設定は反映しません。税は計算しません。お使いの請求書ソフトや表計算で行ってください。</p>
+      <button type="button" class="btn btn-secondary btn-block" id="dlInv" aria-describedby="csvReason">明細CSVを保存</button>
+      <p class="reason-strong" id="csvReason"></p>
+      <p class="sub">はじめての取引先や品目があるときは、先に <a href="#sec-out">取引先CSV・品目CSV</a> を保存します。</p>
+    </section>
+  </div>
+</div>
+
+<section id="sec-out" class="panel">
+  <div class="sechead"><h2>CSVに書き出す(くわしく)</h2><span class="sub">明細CSVの中身を確かめて、取引先CSV・品目CSVを保存します。</span></div>
+  <div class="row" style="margin-bottom:8px;align-items:flex-end">
+    <label>発行日<input type="date" id="issue"></label>
+    <label>支払期限<input type="date" id="due"></label>
+    <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="withPlan" style="min-height:auto"> 予定も含める(まだ行っていない日も請求されます)</label>
+  </div>
+  <p class="hint" id="dnote"></p>
+  <textarea id="out" readonly aria-label="明細CSVに入る内容のプレビュー"></textarea>
+  <ul class="warn" id="warn"></ul>
+  <div id="totals"></div>
+  <p class="note" id="csvGuide">お使いの請求書ソフトに CSV の取りこみがあれば、その見本の形に合わせて変えると、請求書の下書きまで自動で作れます。変え方は『作り方一式』にあります。</p>
+  <p class="step">① 明細CSV(請求の元)です。1つの記録が1行で、請求書(取引先)ごと、日付の順に並びます。「金額(単価×数量・目安)」は、単価×数量(円未満は四捨五入)の目安です。税の表示や端数処理の設定は反映しません。税は計算しません。Excel などの表計算ソフトで開けます。</p>
+  <p class="step">② 取引先CSVは、取引先を請求書ソフトなどに登録するときに使います。「請求書ソフトに登録済み」にチェックを付けた取引先は、CSVに入りません。</p>
+  <p class="step">品目CSVは任意です。「請求書ソフトに登録済み」にチェックを付けた品目は、CSVに入りません。</p>
+  <div class="actions actions-end">
+    <button id="dlCus" class="btn btn-secondary" type="button" aria-describedby="outBtnWhy">取引先CSVを保存</button>
+    <button id="dlItem" class="btn btn-secondary" type="button" aria-describedby="outBtnWhy">品目CSVを保存</button>
+  </div>
+  <p class="reason" id="outBtnWhy" hidden></p>
+  <p class="note">明細CSVの保存は、上の「3 書き出す」のボタンです。CSVは UTF-8(BOMつき)・改行は CRLF で、無保証です。請求書にする前に、内容を必ず自分で確認してください。</p>
+  <p class="note" id="msg"></p>
+</section>
+
+<section id="sec-settings" class="panel">
+  <div class="sechead"><h2>設定(取引先と単価)</h2><span class="sub">取引先と品目を登録しておくと、入力で選べます。</span></div>
+  <p class="note">取引先コードは、請求書と取引先をつなぐ印です。請求書ソフトに登録した取引先があるときは、同じ記号にします。単価は、そのままCSVに書き出します。税の計算はしません(画面の「金額の目安(単価×数量)」と、明細CSVの「金額(単価×数量・目安)」は、単価×数量の目安です)。</p>
+  <details>
+    <summary>「取引先コード」と「請求書ソフトに登録済み」とは</summary>
+    <p>取引先コード: 請求書ソフトの取引先と同じ記号にします。請求書と取引先をつなぐ印になります。</p>
+    <p>請求書ソフトに登録済み: チェックすると、取引先CSV・品目CSVには入りません。二重に登録して、エラーになるのを防ぐためです。</p>
+    <p>税の設定のわけ方: 税区分と源泉徴収は、品目ごとに、品目の「登録」「編集」の画面で選びます。明細CSVの各行に、その品目の税区分と源泉徴収を書きます。消費税の表示と端数処理は、取引先ごとに、取引先の「登録」「編集」の画面で選びます。8%の品目は、品目の税区分で「8%(軽減)」を選びます。税の金額は計算しません。</p>
+    <p>品目の源泉徴収: はじめは「なし」です。</p>
+    <p>源泉徴収: 報酬の種類と支払う側で決まるので、品目ごとに選びます(品目の表)。ここでの設定は、CSVに書く指定だけで、金額の計算はしません。</p>
+  </details>
+  <p class="note" id="cmsg"></p>
+  <p class="note" id="imsg"></p>
+  <div class="subcard" id="cardClients">
+    <div class="colhead"><div><h3>取引先</h3><p class="sub">取引先の名前・コード・請求書の書き方を登録します。</p></div><button id="clientNew" class="btn btn-secondary" type="button">取引先を登録</button></div>
+    <div id="cfgClients"></div>
+  </div>
+  <div class="subcard" id="cardItems">
+    <div class="colhead"><div><h3>品目</h3><p class="sub">サービス(品目)の単価・単位・税の設定を登録します。</p></div><button id="itemNew" class="btn btn-secondary" type="button">品目を登録</button></div>
+    <div id="cfgPrices"></div>
+  </div>
+  <div class="subcard" id="cardBank">
+    <div class="row" style="align-items:flex-end">
+      <label style="flex:1;min-width:240px">振込先(必須)<input id="bank" placeholder="例: 架空銀行 サンプル支店 普通 0000000"></label>
+      <label style="flex:1;min-width:240px">請求書の件名({y}は年、{m}は月に置き換わります)<input id="subject"></label>
+    </div>
+  </div>
+</section>
+
+<section id="sec-backup" class="panel">
+  <div class="sechead"><h2>控え(バックアップ)</h2><span class="sub">入力と設定を、ファイルに控えます。</span></div>
+  <p class="note">入力した行と設定を、1つのファイルに保存できます。控えのファイルには、取引先の住所や連絡先も入ります。ブラウザのデータが消えたときは、このファイルから戻せます。中身は取引先名や振込先などを含むので、人に渡さないでください。</p>
+  <div class="row" style="align-items:flex-end">
+    <button id="dlBackup" class="btn btn-secondary" type="button">控えを保存</button>
+    <label style="flex-direction:row;align-items:center;gap:6px">控えから戻す<input type="file" id="restore" accept=".json,application/json" style="max-width:260px"></label>
+  </div>
+  <p class="note" id="bmsg"></p>
+</section>
+
+<div class="theme-toggle" role="group" aria-label="表示の色"><span>表示の色:</span>
+  <button type="button" class="btn btn-secondary btn-sm" id="themeLight" data-theme-set="light" aria-pressed="false">ライト</button>
+  <button type="button" class="btn btn-secondary btn-sm" id="themeDark" data-theme-set="dark" aria-pressed="false">ダーク</button>
+  <button type="button" class="btn btn-secondary btn-sm" id="themeAuto" data-theme-set="auto" aria-pressed="true">端末に合わせる</button>
+</div>
+
+<details>
+  <summary>このアプリについて</summary>
+  <p>版: 3.0.0(2026-10-25)/作者: ChottoFix(X: @chottofix)/ライセンス: MIT。</p>
+  <p>予定と実績を入れると、ふつうのCSV(明細・取引先・品目)に変わります。データはこの端末のブラウザ内だけに保存され、外へは送られません。</p>
+  <p>このアプリとコードは、作り方の練習として作ったものなので、無料で公開しています。無保証です。</p>
+  <p>練習として作った、特定の請求書ソフトとは無関係の非公式な補助ツールです。無保証です。請求書の内容は、請求書にする前に必ず自分で確認してください。ブラウザのデータを消すと、入力した内容も消えます。「控え(バックアップ)」で、ときどきファイルに保存してください。</p>
+  <p>取引先の住所・電話・メールアドレスなどを入れた場合は、このブラウザの中にそのまま保存されます。共用のパソコンでは入れないでください。</p>
+  <p>このファイルを自分のPCに保存して開いて使う場合、入力した内容はブラウザの中の「手元のファイル用」の置き場所に保存されます。同じブラウザで開いた、ほかのHTMLファイルからも、保存したデータを読めるだけでなく、書きかえることもできます(たとえば、振込先を別の口座に変えられてしまいます)。知らない人から受け取ったHTMLファイルを、同じブラウザで開かないでください。明細CSVを保存する前に、振込先を必ず確かめてください。</p>
+</details>
+
+</div>
+
+<div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button type="button" class="btn" id="undoBtn" hidden>元に戻す</button><button type="button" class="btn" id="toastClose" aria-label="お知らせを閉じる">×</button></div>
+
+<dialog id="dlgClient">
+  <h3 id="cdTitle">取引先を登録</h3>
+  <div class="dlgform">
+    <h4>基本</h4>
+    <label>取引先名(必須)<input id="cdName" autocomplete="off" placeholder="例: ダミーA社"></label>
+    <label>取引先コード<input id="cdCode" autocomplete="off"></label>
+    <label>登録番号(例: T1234567890123)<input id="cdRegNo" autocomplete="off"></label>
+    <label>敬称<select id="cdHon"><option value="御中">御中</option><option value="様">様</option><option value="なし">なし</option></select></label>
+    <label>部署<input id="cdDept" autocomplete="off"></label>
+    <label>担当者<input id="cdPerson" autocomplete="off"></label>
+    <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="cdReg" style="min-height:auto;width:auto"> 請求書ソフトに登録済み</label>
+    <h4>連絡先</h4>
+    <p class="hint" id="cdDemoNote" hidden>デモ版では、架空の取引先だけを扱うので、連絡先は入れられません。取引先コードも決まっています。</p>
+    <p class="hint">住所・電話・メールなどは、このブラウザの中にそのまま保存されます。共用のパソコンでは入れないでください。手元のファイルで使う場合、同じブラウザで開いた他のHTMLファイルからも読めます。</p>
+    <label>メールアドレス<input id="cdMail" autocomplete="off"></label>
+    <label>郵便番号(例: 123-4567)<input id="cdZip" autocomplete="off"></label>
+    <label>住所<input id="cdAddr" autocomplete="off"></label>
+    <label>建物名<input id="cdBldg" autocomplete="off"></label>
+    <label>TEL<input id="cdTel" autocomplete="off"></label>
+    <label>FAX<input id="cdFax" autocomplete="off"></label>
+    <h4>請求書の書き方</h4>
+    <label>消費税の表示<select id="cdMode"><option value="外税(税別)">外税(税別)</option><option value="内税(税込)">内税(税込)</option><option value="内税(免税事業者)">内税(免税事業者)</option></select></label>
+    <label>端数処理<select id="cdRound"><option value="切り捨て">切り捨て</option><option value="切り上げ">切り上げ</option><option value="四捨五入">四捨五入</option></select></label>
+  </div>
+  <p class="hint" id="cdWarn"></p>
+  <p class="errline" id="cdMsg" role="alert"></p>
+  <div class="actions actions-split"><button id="cdCancel" class="btn btn-secondary" type="button">やめる</button><button id="cdSave" class="btn btn-primary" type="button">登録</button></div>
+</dialog>
+<dialog id="dlgItem">
+  <h3 id="itTitle">品目を登録</h3>
+  <div class="dlgform">
+    <label>品目名(=サービス名)<input id="itName" autocomplete="off" placeholder="例: 作業サービス"></label>
+    <label>単価(円/単位)<input type="number" id="itPrice" min="0" placeholder="空でも可"></label>
+    <div class="hint"><span id="itNote"></span><div id="itHist"></div></div>
+    <label>単位<select id="itUnit"><option value="時間">時間</option><option value="回">回</option></select></label>
+    <label>税区分<select id="itKubun"><option value="">10%</option><option value="8%(軽減)">8%(軽減)</option><option value="非課税">非課税</option></select></label>
+    <label>源泉徴収<select id="itWh"><option value="なし">なし</option><option value="10%">10%</option><option value="10.21%">10.21%</option></select></label>
+    <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="itReg" style="min-height:auto;width:auto"> 請求書ソフトに登録済み</label>
+  </div>
+  <p class="errline" id="itMsg" role="alert"></p>
+  <div class="actions actions-split"><button id="itCancel" class="btn btn-secondary" type="button">やめる</button><button id="itSave" class="btn btn-primary" type="button">登録</button></div>
+</dialog>
+<dialog id="dlgDel" aria-labelledby="delTitle">
+  <h2 id="delTitle">この記録を削除しますか</h2>
+  <p id="delBody"></p>
+  <div class="actions actions-split"><button id="delCancel" class="btn btn-secondary" type="button" autofocus>やめる</button><button id="delOk" class="btn btn-danger" type="button">削除する</button></div>
+</dialog>
+
+<dialog id="dlgCal" aria-labelledby="calTitle">
+  <div class="calhead">
+    <div class="calnav">
+      <button type="button" class="btn btn-secondary btn-sm" id="calPrev" aria-label="前の月">‹</button>
+      <h2 id="calTitle"></h2>
+      <button type="button" class="btn btn-secondary btn-sm" id="calNext" aria-label="次の月">›</button>
+    </div>
+    <div class="calleg"><span id="calLegend"></span><span>塗り=実績 / 点線=予定</span><button type="button" class="btn btn-secondary btn-sm" id="calClose">閉じる(Esc)</button></div>
+  </div>
+  <div class="calbody">
+    <div class="calwrap"><div class="cal" id="calGrid"></div></div>
+    <aside class="calside" aria-label="選んだ日の記録">
+      <h3 id="calSelTitle"></h3>
+      <div id="calSelList"></div>
+      <button type="button" class="btn btn-primary" id="calAddDay" aria-describedby="calAddReason">この日に追加する</button>
+      <p class="reason" id="calAddReason" hidden>直している途中です。保存するか、やめてから使えます。</p>
+      <p class="sub">窓が閉じて、入れる欄にこの日付が入ります。</p>
+    </aside>
+  </div>
+</dialog>
+
+<script>
+const DEMO=true;
+// 3つのCSV(明細・取引先・品目)の見出し。どの請求書ソフトのものでもない、ふつうのCSV
+const HDR_LINES=["請求書番号","発行日","支払期限","取引先コード","取引先","敬称","件名","振込先","日付","サービス","数量","単位","開始","終了","単価","金額(単価×数量・目安)","税区分","源泉徴収","消費税の表示","端数処理","種類(予定/実績)"];
+const HDR_CUS=["取引先コード","取引先","敬称","消費税の表示","端数処理","登録番号","担当者","部署","メール","TEL","FAX","郵便番号","住所","建物名"];
+const DEMO_CLIENTS=["A社","B社","C社"],DEMO_SERVICES=["作業サービス","相談サービス"],DEMO_BANK="架空銀行 サンプル支店 普通 0000000";
+// ダミーの名前。実用版では本物と混ざらない専用の名前にする(デモ版は決まった名前そのもの)
+const DUMMY=DEMO?{c:["A社","B社"],s:["作業サービス","相談サービス"]}:{c:["ダミーA社","ダミーB社"],s:["ダミー作業","ダミー相談"]};
+// 数量の単位。サービス(品目)ごとに持つ: cfg.units={サービス名:"時間"|"回"}
+const UNITS=["時間","回"],HM_RE=/^([01]\d|2[0-3]):[0-5]\d$/;
+const HDR_ITEM=["品目","単価(この月)","単位","税区分","源泉徴収"];
+const BOM="\ufeff";
+// 取引先ごとの税の設定の選択肢。税区分の列は、標準は「10%」(8%の品目は、品目の税区分「8%(軽減)」で出す)
+const TAX_OPT={mode:["外税(税別)","内税(税込)","内税(免税事業者)"],round:["切り捨て","切り上げ","四捨五入"],wh:["なし","10%","10.21%"]};
+// 古い保存データ・控えの値を、今の言い方に置き換える表(読むときだけ使う)
+const LEGACY={mode:{"\u7a0e\u5225\u8868\u793a":"外税(税別)","\u7a0e\u8fbc\u8868\u793a":"内税(税込)","\u7a0e\u8fbc\u8868\u793a(\u514d\u7a0e)":"内税(免税事業者)"},round:{"\u5207\u6368\u3066":"切り捨て","\u5207\u4e0a\u3052":"切り上げ"},wh:{"\u3042\u308a(10%)":"10%","\u3042\u308a(\u5fa9\u8208\u7a0e 10.21%)":"10.21%"},kubun:{"軽減8%":"8%(軽減)"},hon:{"\u656c\u79f0\u306a\u3057":"なし"}};
+const mig=(k,v)=>Object.hasOwn(LEGACY[k],v)?LEGACY[k][v]:v;
+// 品目ごとの設定: 税区分 ""=10% / 8%(軽減) / 非課税、源泉徴収 なし / 10% / 10.21%(TAX_OPT.wh と同じ)
+// 請求書の源泉徴収は、その請求書に入る品目から決める(率のある品目があればその率、なければ なし)
+const KUBUN=["","8%(軽減)","非課税"];
+// 取引先の連絡先など(取引先CSVの列)。どれも空でよい。文字は200字まで
+const CFIELDS=["regNo","dept","person","mail","zip","addr","bldg","tel","fax"],HONS=["御中","様","なし"];
+const SKEY=DEMO?"seikyu-matome-demo-v1":"seikyu-matome-v1",CKEY=DEMO?"seikyu-matome-demo-settings-v1":"seikyu-matome-settings-v1";
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}};
+// 保存に失敗したら、画面の上の専用の場所に出す(ほかの文では上書きしない)。成功したら消す
+const store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));$("serr").hidden=true}catch(e){$("serr").hidden=false;$("serr").textContent="保存できませんでした。入力した内容が、このブラウザに残らないおそれがあります。この端末のブラウザの設定を確かめ、「控え(バックアップ)」でファイルに保存してください。"}};
+// 画面の部品を作る(createElement だけを使う。文字は textContent で入れる)
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
+// 名前をキーにする入れ物は、constructor や __proto__ という名前でも壊れないよう、プロトタイプの無いものにする
+const dict=o=>Object.assign(Object.create(null),o);
+// 名前の表記ゆれ(全角半角・前後や連続する空白)をそろえる
+const normName=s=>String(s??"").normalize("NFKC").replace(/\s+/g," ").trim();
+// デモ版は、CSVにダミーの中身しか出さない(設定に何が入っていても)。実用版は設定のとおり
+const DEMO_SUBJECT="{y}年{m}月分 業務委託料";
+const outCode=n=>DEMO?(DEMO_CLIENTS.includes(n)?"DEMO"+(DEMO_CLIENTS.indexOf(n)+1):""):((cfg.clients[n]||{}).code||"");
+const outField=(n,k)=>DEMO?"":((cfg.clients[n]||{})[k]||"");
+const outBank=()=>DEMO?DEMO_BANK:cfg.bank;
+const outSubject=()=>DEMO?DEMO_SUBJECT:cfg.subject;
+const demoClient=n=>!DEMO||DEMO_CLIENTS.includes(n);
+let rows,cfg,undo=null,editId=null,lastMonth="";
+// お知らせの帯。自動では消さない(次の操作で入れかわる)。「元に戻す」は、戻せる操作(undo)が生きている間、帯に出し続ける
+function syncUndo(){
+  $("undoBtn").hidden=!undo;
+  if(undo)$("undoBtn").setAttribute("aria-label","元に戻す("+undo.label+")");
+}
+function notify(msg){
+  $("toastMsg").textContent=msg;$("toast").hidden=false;syncUndo();
+}
+$("toastClose").onclick=()=>{$("toast").hidden=true};
+// 単価は「いつから」で持つ: cfg.priceHist={サービス:[{from:"YYYY-MM",price:数値か""}...]}(from の昇順)。cfg.prices は互換のための写しで、計算には使わない
+const MONTH_RE=/^\d{4}-\d{2}$/,DATE_RE=/^\d{4}-\d{2}-\d{2}$/;
+const toPrice=v=>{if(typeof v==="string"&&v.trim()!=="")v=Number(v);return typeof v==="number"&&isFinite(v)&&v>=0?v:""};
+const byFrom=(a,b)=>a.from<b.from?-1:a.from>b.from?1:0;
+function cleanHist(h){
+  const o=[];
+  for(const e of h)if(e&&typeof e==="object"&&MONTH_RE.test(e.from)&&(e.price===""||toPrice(e.price)===e.price)&&!o.some(x=>x.from===e.from))o.push({from:e.from,price:e.price});
+  return o.sort(byFrom);
+}
+// 品目の源泉徴収の引っ越し(古い版は 空欄=任せる / 適用する / 適用しない、源泉徴収は取引先ごとだった):
+//  ・今の選択肢(なし / 10% / 10.21%)ならそのまま(古い言い方は LEGACY で置き換える)
+//  ・「適用する」→ 古いデータで源泉徴収ありだった最初の取引先の率(無ければ 10.21%)
+//  ・空欄(または項目なし)→ その品目を使う行のうち、源泉徴収ありだった取引先の最初の行の、その取引先の率(無ければ なし)
+//  ・「適用しない」・そのほか → なし
+function itemWhMigrate(s,w,ctx){
+  if(TAX_OPT.wh.includes(mig("wh",w)))return mig("wh",w);
+  const ow=ctx.oldWh;
+  if(w==="適用する"){for(const k of Object.keys(ow))if(ow[k]!=="なし")return ow[k];return TAX_OPT.wh[2]}
+  if(w===""||w===undefined){for(const r of ctx.rows)if(normName(r.service)===s&&ow[normName(r.client)]&&ow[normName(r.client)]!=="なし")return ow[normName(r.client)]}
+  return "なし";
+}
+// 名前をそろえ、priceHist の無いサービスは今の prices から引っ越す
+function fixPrices(c,ctx={oldWh:{},rows:[]}){
+  const raw=c.priceHist&&typeof c.priceHist==="object"&&!Array.isArray(c.priceHist)?c.priceHist:{},H=dict(),P=dict();
+  for(const [n,h] of Object.entries(raw)){const k=normName(n);if(k&&!(k in H)&&Array.isArray(h))H[k]=cleanHist(h)}
+  for(const [n,p] of Object.entries(c.prices&&typeof c.prices==="object"?c.prices:{})){const k=normName(n);if(!k||k in P)continue;P[k]=toPrice(p);if(!(k in H))H[k]=[{from:"0000-00",price:P[k]}]}
+  for(const k of Object.keys(H))if(!(k in P))P[k]=H[k].length?H[k][H[k].length-1].price:"";
+  c.priceHist=H;c.prices=P;
+  // 請求書ソフトに品目を登録済みか(真偽だけ。サービスに無い名前は捨てる)
+  const IR=dict();
+  for(const [n,v] of Object.entries(c.itemReg&&typeof c.itemReg==="object"&&!Array.isArray(c.itemReg)?c.itemReg:{})){const k=normName(n);if(k&&k in H&&typeof v==="boolean"&&!(k in IR))IR[k]=v}
+  c.itemReg=IR;
+  // 単位(時間か回)。決まっていないサービスは、今までどおり「時間」
+  const UN=dict();
+  for(const [n,v] of Object.entries(c.units&&typeof c.units==="object"&&!Array.isArray(c.units)?c.units:{})){const k=normName(n);if(k&&k in H&&UNITS.includes(v)&&!(k in UN))UN[k]=v}
+  for(const k of Object.keys(H))if(!(k in UN))UN[k]="時間";
+  c.units=UN;
+  // 品目ごとの税区分・源泉徴収。決まっていない品目は、標準(10%)・源泉なし
+  const IT=dict();
+  for(const [n,v] of Object.entries(c.itemTax&&typeof c.itemTax==="object"&&!Array.isArray(c.itemTax)?c.itemTax:{})){
+    const k=normName(n);if(!k||!(k in H)||k in IT||!v||typeof v!=="object")continue;
+    IT[k]={kubun:KUBUN.includes(mig("kubun",v.kubun))?mig("kubun",v.kubun):"",wh:itemWhMigrate(k,v.wh,ctx)};
+  }
+  for(const k of Object.keys(H))if(!(k in IT))IT[k]={kubun:"",wh:itemWhMigrate(k,undefined,ctx)};
+  c.itemTax=IT;
+}
+// 設定全体をそろえる(古い保存データ・控えに無い項目は、ここで作る)
+function fixSeq(c){
+  let m=Number.isInteger(c.codeSeq)&&c.codeSeq>=0?c.codeSeq:0;
+  for(const x of Object.values(c.clients)){const r=/^A(\d+)$/.exec(x.code||"");if(r)m=Math.max(m,+r[1])}
+  c.codeSeq=m;
+}
+function fixCfg(c,rws=rows){
+  const cl=dict();
+  for(const [n,x] of Object.entries(c.clients&&typeof c.clients==="object"?c.clients:{})){const k=normName(n);if(k&&x&&typeof x==="object"&&!(k in cl))cl[k]=x}
+  // 取引先ごとの税の設定。無いものは、古い版の全体の設定(c.tax)から引っ越す。それも無ければ 外税(税別)・切り捨て・源泉徴収なし
+  // (古い版の全体の消費税率は、請求書ではいつも10%で出すことにしたので、引っ越さない)
+  const old=c.tax&&typeof c.tax==="object"&&!Array.isArray(c.tax)?c.tax:{};
+  const pick=(list,kind,v,o)=>{for(const x of [v,o]){const y=mig(kind,x);if(list.includes(y))return y}return list[0]};
+  // 古い版の取引先ごとの源泉徴収(x.wh)は、品目の引っ越し(itemWhMigrate)のために読んだあと、取引先からは消す
+  for(const x of Object.values(cl)){
+    for(const k of CFIELDS)x[k]=typeof x[k]==="string"&&x[k].trim().length<=200?x[k].trim():"";
+    // 古い版にあった、部署・担当者を書類に載せるかどうかの項目は、使わない(あっても捨てる)
+    delete x.deptPrint;delete x.personPrint;
+    x.hon=HONS.includes(mig("hon",x.hon))?mig("hon",x.hon):"御中";
+  }
+  const oldWh=dict();
+  for(const [k,x] of Object.entries(cl)){x.taxMode=pick(TAX_OPT.mode,"mode",x.taxMode,old.mode);x.round=pick(TAX_OPT.round,"round",x.round,old.round);oldWh[k]=pick(TAX_OPT.wh,"wh",x.wh,old.wh);delete x.wh}
+  delete c.tax;
+  c.clients=cl;fixPrices(c,{oldWh,rows:Array.isArray(rws)?rws:[]});
+  // 取引先コードの通し番号: 今までに出した一番大きい番号(消しても戻さない)
+  fixSeq(c);
+  c.lastBank=typeof c.lastBank==="string"?c.lastBank:"";
+  // 手で直した発行日・期限(月ごと)。YYYY-MM をキー、YYYY-MM-DD を値とするものだけ残す
+  const DT=dict(),dr=c.dates&&typeof c.dates==="object"&&!Array.isArray(c.dates)?c.dates:{};
+  for(const [mo,v] of Object.entries(dr)){
+    if(!MONTH_RE.test(mo)||!v||typeof v!=="object")continue;
+    const e={};for(const k of ["issue","due"])if(typeof v[k]==="string"&&DATE_RE.test(v[k]))e[k]=v[k];
+    if(e.issue||e.due)DT[mo]=e;
+  }
+  c.dates=DT;
+}
+const cloneCfg=()=>JSON.parse(JSON.stringify(cfg));
+function loadState(){
+  rows=load(SKEY,[]);cfg=load(CKEY,{});
+  if(!Array.isArray(rows))rows=[];
+  rows=rows.filter(r=>r&&typeof r==="object"&&typeof r.date==="string"&&typeof r.client==="string"&&typeof r.service==="string");
+  if(!cfg||typeof cfg!=="object"||Array.isArray(cfg))cfg={};
+  if(!cfg.clients||typeof cfg.clients!=="object")cfg.clients={};
+  if(!cfg.prices||typeof cfg.prices!=="object")cfg.prices={};
+  cfg.bank??="";cfg.subject??="{y}年{m}月分 業務委託料";
+  if(DEMO){cfg.bank=DEMO_BANK;cfg.subject=DEMO_SUBJECT}
+  normalizeState();
+}
+// そろえた結果が同じ名前になるものは、先に出た設定を残す
+function normalizeState(){
+  fixCfg(cfg);
+  rows=rows.map(r=>({...r,client:normName(r.client),service:normName(r.service)}));
+}
+loadState();
+// その月の単価: from がその月以前のうち、最も新しいもの。無ければ ""(未設定)
+function priceFor(s,mo){let p="";for(const e of cfg.priceHist[s]||[])if(e.from<=mo)p=e.price;return p}
+// mo から先の単価を val にする。1つ前と同じ値なら履歴を増やさない
+function setPrice(s,mo,val){
+  const v=toPrice(val),h=(cfg.priceHist[s]??=[]);let prev="";
+  for(const e of h)if(e.from<mo)prev=e.price;
+  const i=h.findIndex(e=>e.from===mo);if(i>=0)h.splice(i,1);
+  if(prev!==v){h.push({from:mo,price:v});h.sort(byFrom)}
+  cfg.prices[s]=v;
+}
+const jaMonth=f=>f==="0000-00"?"最初":+f.slice(0,4)+"年"+ +f.slice(5)+"月";
+const priceHead=mo=>mo?"単価("+jaMonth(mo)+"から先・円/時間)":"単価(円/時間)";
+const yen=p=>p===""?"未設定":Number(p).toLocaleString("ja-JP")+"円";
+// 単価の変更(いま選んでいる月から先)。結果の文を返す。あとの月に別の単価があれば、それは変わらないと知らせる
+function priceChange(s,mo,val){
+  setPrice(s,mo,val);
+  const nx=(cfg.priceHist[s]||[]).find(e=>e.from>mo);
+  return s+": "+jaMonth(mo)+"から "+yen(priceFor(s,mo))+"にしました。"+(nx?jaMonth(nx.from)+"からは "+yen(nx.price)+"のままです。":"");
+}
+// その取引先の請求書の税の設定
+const itemTaxOf=s=>(cfg.itemTax&&cfg.itemTax[s])||{kubun:"",wh:"なし"};
+// その請求書(取引先の行 rs)に入る品目の、源泉徴収の率(重複なし)。請求書の源泉徴収は、ありの品目があればその率、なければ なし
+const taxLabel=n=>cfg.clients[n].taxMode+"・"+cfg.clients[n].round;
+// 品目の税の設定が標準でないときの、画面の見出し用の短い説明
+const itemTaxNote=s=>{const t=itemTaxOf(s);return (t.kubun?" ("+t.kubun+")":"")+(t.wh!=="なし"?" (源泉"+t.wh+")":"")};
+const unitOf=s=>(cfg.units&&cfg.units[s])||"時間";
+// 行の数量: 行のデータは、時間の行も回の行も、同じ hours という項目に数を入れる(名前は変えない)。単位は行のサービスの単位(cfg.units)で決まる。
+// 開始・終了(start / end)は「HH:MM」で、時間の行に任意でつく。CSVには使わない
+const hmShort=s=>String(+s.slice(0,2))+s.slice(2);
+const hmRange=r=>r.start&&r.end?hmShort(r.start)+"〜"+hmShort(r.end):"";
+const toMin=s=>+s.slice(0,2)*60+ +s.slice(3);
+// 開始・終了から時間を出す(小数2桁まで)
+function calcHours(a,b){
+  if(!HM_RE.test(a)||!HM_RE.test(b))return {ok:false,msg:"時刻を入れてください"};
+  if(toMin(b)<=toMin(a))return {ok:false,msg:"終了は開始より後の時刻にしてください(日をまたぐ時間は、時間の欄に直接入れてください)"};
+  return {ok:true,hours:Math.round((toMin(b)-toMin(a))/60*100)/100};
+}
+// 数量の確かめ: 回は1以上の整数、時間は0以上の数。問題があれば文を返す
+function qtyError(s,q){
+  if(unitOf(s)==="回")return Number.isInteger(q)&&q>=1?"":"回数は、1以上の整数で入れてください。";
+  return Number.isFinite(q)&&q>=0?"":"時間は、0以上の数で入れてください。";
+}
+// 開始・終了: 時間のサービスで、両方そろって正しいときだけ行につける(片方だけ・順番が逆は null)
+function timesOf(s,v){
+  const a=v.start||"",b=v.end||"";
+  if(!a&&!b)return {};
+  if(unitOf(s)==="回")return {};
+  const r=calcHours(a,b);
+  return r.ok&&Math.abs(r.hours-v.hours)<=0.005?{start:a,end:b}:null; // 時間と合わないときは付けない
+}
+function histText(s){
+  const h=cfg.priceHist[s]||[];
+  return h.length?h.map(e=>(e.from==="0000-00"?"最初から":jaMonth(e.from)+"〜")+" "+(e.price===""?"未設定":Number(e.price).toLocaleString("ja-JP")+"円")).join(" / "):"未設定";
+}
+
+const pad=(n,w=2)=>String(n).padStart(w,"0");
+const ym=d=>d.slice(0,7);
+const fmt=n=>(Math.round(n*100)/100).toString();
+const mdw=d=>{const t=new Date(d+"T00:00:00");return (t.getMonth()+1)+"/"+t.getDate()+"("+"日月火水木金土"[t.getDay()]+")"};
+const md=d=>{const t=new Date(d+"T00:00:00");return (t.getMonth()+1)+"/"+t.getDate()};
+const iso=dt=>dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate());
+// 新しい取引先コード: 今までに出した番号の次(削除しても使い回さない)
+const nextCode=()=>{fixSeq(cfg);cfg.codeSeq+=1;return "A"+pad(cfg.codeSeq,3)};
+const newCode=n=>DEMO&&DEMO_CLIENTS.includes(n)?"DEMO"+(DEMO_CLIENTS.indexOf(n)+1):nextCode();
+function ensureClients(){fixCfg(cfg);let ch=false;for(const r of rows){if(!cfg.clients[r.client]){cfg.clients[r.client]={code:newCode(r.client),hon:"御中",reg:false};ch=true}if(!(r.service in cfg.prices)&&!(r.service in cfg.priceHist)){cfg.prices[r.service]="";cfg.priceHist[r.service]=[];ch=true}}fixCfg(cfg);if(ch)store(CKEY,cfg)}
+
+// 候補は選択欄にすべて出す(入力欄に値があっても絞らない)。選ぶと入力欄に入る
+for(const [pick,input] of [["clientPick","client"],["servicePick","service"]]){
+  $(pick).addEventListener("change",()=>{if($(pick).value){$(input).value=$(pick).value}$(pick).value="";updateQtyUI()});
+}
+// 入れる欄の数量: サービスが「回」なら「回数」(1以上の整数・初めは1)、「時間」なら「時間(h)」。開始・終了は時間のときだけ使える
+let qtyAuto=false;
+function updateQtyUI(){
+  const kai=unitOf(normName($("service").value))==="回",h=$("hours");
+  $("qtyText").textContent=kai?"回数":"時間(h)";
+  h.step=kai?"1":"any";h.min=kai?"1":"0";h.placeholder=kai?"1":"1.5";
+  if(kai){if(h.value===""){h.value="1";qtyAuto=true}}
+  else{if(qtyAuto&&h.value==="1")h.value="";qtyAuto=false}
+  for(const id of ["tmStartL","tmEndL"])$(id).hidden=kai;
+  for(const id of ["tmStart","tmEnd"]){$(id).disabled=kai;if(kai)$(id).value=""}
+}
+$("service").addEventListener("input",updateQtyUI);$("service").addEventListener("change",updateQtyUI);
+// 時間を手で直したら、開始・終了は消す(時間と合わなくなるため)。自動で入れたときは、この出来事は起きない
+$("hours").addEventListener("input",()=>{
+  qtyAuto=false;
+  if($("tmStart").value||$("tmEnd").value){$("tmStart").value="";$("tmEnd").value="";setMsg("時間を直接入れたので、開始・終了を消しました。")}
+});
+// 開始・終了が両方入ったら、時間の欄に入れる(あとで直してもよい)
+function timesChanged(){
+  const a=$("tmStart").value,b=$("tmEnd").value;
+  if(!a||!b){setMsg("");return}
+  const r=calcHours(a,b);setMsg(r.ok?"":r.msg,!r.ok);
+  if(r.ok){$("hours").value=String(r.hours);qtyAuto=false}
+}
+$("tmStart").addEventListener("change",timesChanged);$("tmEnd").addEventListener("change",timesChanged);
+if(DEMO){
+  $("demoBanner").hidden=false;
+  for(const id of ["client","service","bank"])$(id).readOnly=true;
+  $("client").placeholder="右で選ぶ";$("service").placeholder="右で選ぶ";
+}
+function fillPick(id,names,label){
+  const s=$(id);s.replaceChildren();
+  const o0=document.createElement("option");o0.value="";o0.textContent="▼ "+label;s.append(o0);
+  for(const n of names){const o=document.createElement("option");o.value=n;o.textContent=n;s.append(o)}
+  // 候補がまだ無いときは、空の選択欄(開いても何も出ない)を見せない。入力すると、次から出る
+  s.hidden=!names.length;s.disabled=!names.length;
+}
+// 今日・今月は、この端末の時刻(日本の午前0〜9時でも前の日にならない)
+const todayIso=()=>iso(new Date());
+const thisMonth=()=>ym(todayIso());
+// 種類の決め方: 今日より後の日付は予定、今日までは実績
+const kindFor=date=>date>todayIso()?"plan":"act";
+$("date").value=todayIso();
+$("month").value=thisMonth();
+
+// 発行日・期限: その月に手で直した値があればそれ、なければ月末・翌月末
+function setDates(){
+  const mo=$("month").value,[y,m]=mo.split("-").map(Number);if(!y)return;
+  const d=cfg.dates[mo]||{};
+  $("issue").value=d.issue??iso(new Date(y,m,0));$("due").value=d.due??iso(new Date(y,m+1,0));
+}
+setDates();
+// 月が変わったときだけ、発行日と期限を月末・翌月末にし直す(手で直した日付を、行の追加では戻さない)
+function monthChanged(){
+  setDates();
+  $("dnote").textContent=!$("month").value?"":cfg.dates[$("month").value]?"この月で前に直した、発行日と支払期限を使っています。":"月が変わったので、発行日と支払期限を、月末と翌月末にしました。";
+}
+// 保存してある設定を、設定の入力欄に出す
+function syncInputs(){
+  $("bank").value=cfg.bank;$("subject").value=DEMO?DEMO_SUBJECT:cfg.subject;
+}
+syncInputs();
+// 設定を変えたら、設定ごと戻す種類の「元に戻す」は消える(あとの設定変更を巻き戻さないため)
+function saveCfg(){if(undo&&undo.cfg){undo=null;syncUndo()}store(CKEY,cfg)}
+
+// 行を変えたら、直前の「元に戻す」は消える(一括操作と、undoable の中身は、あとで undo を入れ直す)
+function saveRows(){undo=null;syncUndo();store(SKEY,rows)}
+// デモ版は、決まった取引先・サービス以外を受け付けない
+const nameOk=(c,s)=>!DEMO||(DEMO_CLIENTS.includes(c)&&DEMO_SERVICES.includes(s));
+function addRow(v){
+  const c=normName(v.client),s=normName(v.service);if(!nameOk(c,s)||qtyError(s,v.hours))return null;
+  const tm=timesOf(s,v);if(!tm)return null;
+  const r={id:Date.now()+Math.random(),date:v.date,client:c,service:s,hours:v.hours,kind:v.kind,...tm};
+  rows.push(r);saveRows();return r;
+}
+// 行を置き換える(id はそのまま)
+function updateRow(id,v){
+  const i=rows.findIndex(r=>r.id===id),c=normName(v.client),s=normName(v.service);
+  if(i<0||!nameOk(c,s)||qtyError(s,v.hours))return null;
+  const tm=timesOf(s,v);if(!tm)return null;
+  rows[i]={id,date:v.date,client:c,service:s,hours:v.hours,kind:v.kind,...tm};saveRows();return rows[i];
+}
+// 表示中の年と違う年の日付には、年をつける(2027年3/5)
+const yearPre=date=>+date.slice(0,4)!==+(($("month").value||thisMonth()).slice(0,4))?+date.slice(0,4)+"年":"";
+const rowLabel=r=>yearPre(r.date)+md(r.date)+" "+r.client;
+const kindName=k=>k==="act"?"実績":"予定";
+// 1行ずつの操作(追加・直す・実績にする・予定に戻す)も、お知らせの「元に戻す」で戻せるようにする。
+// fn の中の saveRows が undo を消すので、undo は fn のあとで入れる。fn が null / false を返したとき(失敗)は何もしない。msg は文か、結果を受け取る関数
+function undoable(label,msg,fn){
+  const before=snap(),beforeCfg=cloneCfg(),r=fn();
+  if(r===null||r===false||r===undefined)return r;
+  undo={label,rows:before,cfg:beforeCfg};
+  notify(typeof msg==="function"?msg(r):msg,true);return r;
+}
+function setKind(r,k){
+  return undoable(k==="act"?"実績にした":"予定に戻した",rowLabel(r)+" を"+(k==="act"?"実績にしました":"予定に戻しました")+"。",()=>{r.kind=k;saveRows();return true});
+}
+// 行の削除。確かめは別窓(askDelete → #delOk)で行う。直前の1回分は「元に戻す」で戻せる
+function deleteRow(id){
+  const r=rows.find(x=>x.id===id);if(!r)return false;
+  const before=snap();rows=rows.filter(x=>x.id!==id);bulkStore("削除した行",before);
+  notify(rowLabel(r)+" を削除しました。",true);return true;
+}
+
+// ---- 入れ方(1行 / 欄)。最後に選んだ方を覚える(アプリのデータとは別の保存場所。失敗しても何も出さない) ----
+const INPUT_KEY="seikyu-matome-input-v1";
+let mode="form",tried=false;
+try{if(localStorage.getItem(INPUT_KEY)==="line")mode="line"}catch(e){}
+const focusFirst=()=>focusOn(mode==="line"?"q":"date");
+function setMsg(text,isErr=false){$("fmsg").textContent=text;$("fmsg").className=isErr?"note err":"note"}
+function setMode(m,remember=true){
+  mode=m;tried=false;
+  $("lineBox").hidden=m!=="line";$("formBox").hidden=m!=="form";
+  $("modeLine").setAttribute("aria-pressed",String(m==="line"));$("modeForm").setAttribute("aria-pressed",String(m==="form"));
+  $("q").removeAttribute("aria-invalid");
+  if(remember){try{localStorage.setItem(INPUT_KEY,m)}catch(e){}}
+  setMsg("");renderRead();
+}
+const kindOfForm=()=>{const k=$("kind").value;return k==="act"||k==="plan"?k:kindFor($("date").value)};
+// 欄の中身(まだ確かめていない)
+const formValues=()=>({date:$("date").value,client:$("client").value,service:$("service").value,hours:parseFloat($("hours").value),kind:kindOfForm(),start:$("tmStart").value,end:$("tmEnd").value});
+// 欄に、行(または読み取った結果)の中身を入れる
+function fillForm(v){
+  $("date").value=v.date;$("client").value=v.client;$("service").value=v.service;$("hours").value=v.hours;
+  $("kind").value=v.kind;$("tmStart").value=v.start||"";$("tmEnd").value=v.end||"";qtyAuto=false;updateQtyUI();
+}
+// 読めた所だけでも欄に入れる(読めなかった所は、今の欄のまま)
+function fillPart(x){
+  if(x.date)$("date").value=x.date;
+  if(x.client)$("client").value=x.client;
+  if(x.service)$("service").value=x.service;
+  qtyAuto=false;updateQtyUI();
+  if(x.hours!==null&&x.hours!==undefined&&x.service)$("hours").value=x.hours;
+  if(x.start&&x.end&&x.service&&unitOf(x.service)!=="回"){$("tmStart").value=x.start;$("tmEnd").value=x.end}
+  if(x.kind)$("kind").value=x.kind;
+}
+$("modeForm").onclick=()=>{
+  if(mode==="line"){const p=lineCheck();if(p.ok)fillForm(p.v);else fillPart(p.part)}
+  setMode("form");
+};
+$("modeLine").onclick=()=>{
+  if(mode==="form"){const v=formValues();if(v.date&&normName(v.client)&&normName(v.service)&&Number.isFinite(v.hours))$("q").value=lineOf(v)}
+  setMode("line");
+};
+function startEdit(r){
+  editId=r.id;fillForm(r);$("q").value=lineOf(r);tried=false;
+  $("addTitle").textContent="記録を直す";$("editLabel").textContent=rowLabel(r)+" ";$("editing").hidden=false;
+  $("submitBtn").textContent="直した内容で保存する";$("cancelEdit").hidden=false;
+  $("q").removeAttribute("aria-invalid");setMsg("");renderRead();$("sec-enter").scrollIntoView();focusFirst();
+}
+function endEdit(){
+  editId=null;$("client").value="";$("service").value="";$("hours").value="";$("tmStart").value="";$("tmEnd").value="";$("q").value="";$("kind").value="auto";updateQtyUI();
+  $("addTitle").textContent="記録を入れる";$("editing").hidden=true;
+  $("submitBtn").textContent="追加する";$("cancelEdit").hidden=true;tried=false;$("q").removeAttribute("aria-invalid");renderRead();
+}
+$("cancelEdit").onclick=()=>{endEdit();setMsg("")};
+// 追加 / 直した内容の保存(欄でも1行でも、ここを通る)。v={date,client,service,hours,kind,start,end}
+function commit(v){
+  const edit=editId!=null,mo0=$("month").value;
+  const r=undoable(edit?"直した":"追加した",row=>{
+    const moved=ym(row.date)!==mo0;
+    return (edit?rowLabel(row)+" を直しました":rowLabel(row)+" を"+kindName(row.kind)+"に追加しました")+(moved?"("+(+row.date.slice(5,7))+"月に移りました)":"")+"。";
+  },()=>edit?updateRow(editId,v):addRow(v));
+  if(!r){setMsg(DEMO?"デモ版では、右の選択欄から、決まった取引先とサービスを選んでください。":"この行は保存できませんでした。",true);return false}
+  setMsg("");
+  if(edit)endEdit();
+  else{$("client").value=r.client;$("service").value=r.service;$("hours").value="";$("tmStart").value="";$("tmEnd").value="";$("q").value="";qtyAuto=false;updateQtyUI();tried=false;$("q").removeAttribute("aria-invalid");renderRead()}
+  $("month").value=ym(r.date);if($("month").value!==mo0)monthChanged();render();
+  return true;
+}
+$("f").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(mode==="line"){
+    const p=lineCheck();
+    if(!p.ok){tried=true;$("q").setAttribute("aria-invalid","true");renderRead();focusOn("q");return}
+    commit(p.v);return;
+  }
+  const v=formValues();
+  // ブラウザの入力チェックの吹き出しは、画面や幅によって見切れるので使わない(novalidate)。かわりに、同じ内容を画面の文で出す
+  const sv=normName(v.service);
+  const need=!v.date?["date","日付を入れてください。"]:!normName(v.client)?["client","取引先を入れてください(右の「▼ 選ぶ」からも選べます)。"]:!sv?["service","サービスを入れてください(右の「▼ 選ぶ」からも選べます)。"]:null;
+  if(need){setMsg(need[1],true);focusOn(need[0]);return}
+  if(!Number.isFinite(v.hours)){setMsg(unitOf(sv)==="回"?"回数を入れてください。":"時間を入れてください(開始と終了を入れると、自動で入ります)。",true);focusOn("hours");return}
+  const qe=qtyError(sv,v.hours);if(qe){setMsg(qe,true);return}
+  if(unitOf(sv)!=="回"&&(v.start||v.end)){
+    if(!(v.start&&v.end)){setMsg("開始と終了の両方を入れてください(片方だけは保存しません)。",true);return}
+    const tr=calcHours(v.start,v.end);if(!tr.ok){setMsg(tr.msg,true);return}
+    if(Math.abs(tr.hours-v.hours)>0.005){setMsg("時間と、開始・終了が合いません。どちらかを直してください。",true);return}
+  }
+  commit(v);
+});
+// ================= 1行で入れる(読み取り) =================
+// 名前の比べ方: 全角半角・空白・大文字小文字をそろえる。「株式会社」などの法人格と「ダミー」を外した形でも当てる
+const squash=n=>normName(n).replace(/\s/g,"");
+const key=n=>squash(n).toUpperCase();
+const baseKey=n=>key(n).replace(/株式会社|有限会社|合同会社|\(株\)|\(有\)|ダミー/g,"");
+const baseName=n=>normName(n).replace(/株式会社|有限会社|合同会社|\(株\)|\(有\)|ダミー/g,"").trim()||normName(n);
+// 札の文字で名前を探す。ぴったり同じものが1つだけならそれ。そうでなければ、頭が合うもの全部(2つ以上なら、選ばずに止める)
+function matchNames(names,tok){
+  const T=key(tok);if(!T)return [];
+  const hit=names.filter(n=>key(n).startsWith(T)||baseKey(n).startsWith(T));
+  const full=hit.filter(n=>key(n)===T);
+  if(full.length===1)return full;
+  const exact=hit.filter(n=>key(n)===T||baseKey(n)===T);
+  return exact.length===1?exact:hit;
+}
+// 日付: 10/21・10月21日・2026/10/21。年が無ければ表示中の月の年。表示中の月と6か月を超えて離れるなら、前の年・次の年にする。ない日付は {bad:true}。日付の形でなければ null
+function readDate(t,my,mm){
+  let m=/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(t),y,mo,d;
+  if(m){y=+m[1];mo=+m[2];d=+m[3]}
+  else if((m=/^(\d{1,2})[\/月](\d{1,2})日?$/.exec(t))){
+    mo=+m[1];d=+m[2];y=my;
+    const diff=mo-mm;
+    if(diff>6)y=my-1;else if(diff<-6)y=my+1;
+  }else return null;
+  const dt=new Date(y,mo-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return {bad:true};
+  return {date:y+"-"+pad(mo)+"-"+pad(d)};
+}
+// 時間帯: 9:00-11:00・9-11・9〜11。HH:MM の2桁にそろえ、時間は calcHours で出す(0.25刻みには丸めない)
+function readTime(t){
+  const m=/^(\d{1,2})(?::(\d{2}))?[-~〜](\d{1,2})(?::(\d{2}))?$/.exec(t);
+  if(!m)return null;
+  const a=String(+m[1]).padStart(2,"0")+":"+(m[2]||"00"),b=String(+m[3]).padStart(2,"0")+":"+(m[4]||"00");
+  if(!HM_RE.test(a)||!HM_RE.test(b))return {bad:true,why:+m[1]===24||+m[3]===24?"24時は使えません(23:59 まで)":""};
+  const r=calcHours(a,b);
+  return r.ok?{start:a,end:b,hours:r.hours}:{bad:true,why:"終了は開始より後に"};
+}
+// 1行の文を読み取る。mo は表示中の月(YYYY-MM)。結果: {ok, v(追加する中身), parts(札), miss(足りないもの)}
+function parseLine(text,mo){
+  const [my,mm]=mo.split("-").map(Number),toks=normName(text).split(/\s+/).filter(Boolean),{cl,sv}=candidates();
+  const o={date:"",client:"",cAmb:null,service:"",sAmb:null,start:"",end:"",th:null,qh:null,qn:null,kindWord:"",unknown:[]};
+  for(let i=0;i<toks.length;i++){
+    const t=toks[i];
+    const dt=readDate(t,my,mm);
+    if(dt){if(dt.bad||o.date)o.unknown.push({t,why:""});else o.date=dt.date;continue}
+    const tm=readTime(t);
+    if(tm){if(tm.bad||o.start)o.unknown.push({t,why:tm.why||""});else{o.start=tm.start;o.end=tm.end;o.th=tm.hours;if(/^[0-9]{1,2}-[0-9]{1,2}$/.test(t))o.dash=t}continue}
+    let m;
+    if((m=/^(\d+(?:\.\d+)?)(h|H|時間)$/.exec(t))){if(o.qh!==null)o.unknown.push({t,why:""});else o.qh=Number(m[1]);continue}
+    if((m=/^(\d+)回$/.exec(t))){if(o.qn!==null)o.unknown.push({t,why:""});else o.qn=Number(m[1]);continue}
+    if(t==="予定"||t==="実績"){o.kindWord=t;continue}
+    // 空白のある名前(山田 太郎)は、続く言葉(最大3つ)をつないで当てる。長い方を優先する
+    const tryName=names=>{for(let j=Math.min(toks.length-1,i+2);j>i;j--){const h=matchNames(names,toks.slice(i,j+1).join(" "));if(h.length)return {h,j}}const h=matchNames(names,t);return h.length?{h,j:i}:null};
+    if(!o.client&&!o.cAmb){const r=tryName(cl);if(r){if(r.h.length===1)o.client=r.h[0];else o.cAmb=r.h;i=r.j;continue}}
+    if(!o.service&&!o.sAmb){const r=tryName(sv);if(r){if(r.h.length===1)o.service=r.h[0];else o.sAmb=r.h;i=r.j;continue}}
+    o.unknown.push({t,why:""});
+  }
+  const miss=[],parts=[],ok_=t=>({t,cls:"chip-ok"}),ng=t=>({t,cls:"chip-miss"});
+  let v=null;
+  // 日付
+  if(o.date){parts.push(ok_((+o.date.slice(0,4)!==my?+o.date.slice(0,4)+"年":"")+mdw(o.date)+(ym(o.date)!==mo?" ※"+(+o.date.slice(5,7))+"月に入ります":"")))}
+  else{parts.push(ng("日付が分かりません"));miss.push("日付(例 10/21)");if(o.dash)parts.push(ng("日付は 10/21 と書きます"))}
+  // 取引先
+  if(o.cAmb){parts.push(ng("取引先の候補: "+o.cAmb.join(" / ")));miss.push("取引先(候補が"+o.cAmb.length+"つ。もう少し書いてください)")}
+  else if(o.client)parts.push(ok_(o.client));
+  else{parts.push(ng("取引先が分かりません"));miss.push("取引先")}
+  // サービス
+  if(o.sAmb){parts.push(ng("サービスの候補: "+o.sAmb.join(" / ")));miss.push("サービス(候補が"+o.sAmb.length+"つ。もう少し書いてください)")}
+  else if(o.service)parts.push(ok_(o.service));
+  else{parts.push(ng("サービスが分かりません"));miss.push("サービス")}
+  // 数量(サービスの単位で決まる)
+  let hours=null,start="",end="";
+  const rangeText=()=>hmShort(o.start)+"〜"+hmShort(o.end)+"("+fmt(o.th)+"時間)";
+  if(o.service){
+    if(unitOf(o.service)==="回"){
+      if(o.qh!==null)o.unknown.push({t:fmt(o.qh)+"時間",why:"このサービスは回数です"});
+      const n=o.qn===null?1:o.qn,qe=qtyError(o.service,n);
+      if(qe){parts.push(ng(fmt(n)+"回は入れられません"));miss.push("回数(1以上の整数)")}
+      else{hours=n;parts.push(ok_(fmt(n)+"回"))}
+      if(o.start)parts.push(ok_("時間帯は記録しません"));
+    }else{
+      if(o.qn!==null)o.unknown.push({t:fmt(o.qn)+"回",why:"このサービスは時間です"});
+      if(o.start&&o.qh!==null&&Math.abs(o.th-o.qh)>0.005){parts.push(ng("時間と、開始・終了が合いません"));miss.push("時間と、開始・終了が合いません")}
+      else if(o.start){hours=o.th;start=o.start;end=o.end;parts.push(ok_(rangeText()))}
+      else if(o.qh!==null){hours=o.qh;parts.push(ok_(fmt(o.qh)+"時間"))}
+      else{parts.push(ng("時間が分かりません"));miss.push("時間(例 9:00-11:00)")}
+    }
+  }else{
+    if(o.start)parts.push(ok_(rangeText()));
+    if(o.qh!==null)parts.push(ok_(fmt(o.qh)+"時間"));
+    if(o.qn!==null)parts.push(ok_(fmt(o.qn)+"回"));
+  }
+  // 種類(書かなければ日付で決める)
+  const kind=o.kindWord?(o.kindWord==="予定"?"plan":"act"):o.date?kindFor(o.date):null;
+  if(kind)parts.push(ok_(kind==="plan"?"予定として":"実績として"));
+  // 読めない言葉は、黙って捨てずに止める
+  for(const u of o.unknown){parts.push(ng("「"+u.t+"」は読めません"+(u.why?"("+u.why+")":"")));miss.push("読めない言葉「"+u.t+"」"+(u.why?"("+u.why+")":""))}
+  const ok=!miss.length&&hours!==null;
+  if(ok)v={date:o.date,client:o.client,service:o.service,hours,kind,start,end};
+  const hh=hours!==null?hours:o.th!==null?o.th:o.qh!==null?o.qh:o.qn;
+  return {ok,v,parts,miss,empty:!toks.length,part:{date:o.date,client:o.client,service:o.service,hours:hh,start:o.start,end:o.end,kind:o.kindWord?(o.kindWord==="予定"?"plan":"act"):""}};
+}
+const lineCheck=()=>parseLine($("q").value,$("month").value||thisMonth());
+// 行を1行の文にする(直す時、1行の欄に入れる)。parseLine(lineOf(r)) は同じ中身に戻る
+function lineOf(r){
+  const p=[+r.date.slice(0,4)+"/"+md(r.date),squash(r.client),squash(r.service)];
+  if(unitOf(normName(r.service))==="回"){if(r.hours!==1)p.push(fmt(r.hours)+"回")}
+  else p.push(r.start&&r.end?r.start+"-"+r.end:fmt(r.hours)+"時間");
+  p.push(kindName(r.kind));
+  return p.join(" ");
+}
+// 読み取りの札と、足りないものの文だけを描き直す(render はしない)
+function renderRead(){
+  const p=lineCheck(),empty=p.empty;
+  const kids=empty?[el("span","sub","「日付 取引先 サービス 時間」の順に、空白で区切って入れます。")]:[el("span","sub","読み取り:"),...p.parts.map(x=>el("span",x.cls,x.t))];
+  $("qRead").replaceChildren(...kids);
+  if(mode!=="line")return;
+  if(tried&&!p.ok)setMsg("エラー: "+p.miss.join("、")+"を直してから押してください。",true);
+  else if(empty)setMsg("");
+  else if(!p.ok)setMsg("まだ足りないもの: "+p.miss.join("、"));
+  else setMsg("Enterキーでも追加できます。");
+  if(p.ok)$("q").removeAttribute("aria-invalid");
+}
+$("q").addEventListener("input",()=>{tried=false;$("q").removeAttribute("aria-invalid");renderRead()});
+
+// 別のタブで保存されたら読み直す(古い内容で上書きしないため)
+window.addEventListener("storage",e=>{
+  if(e.key!==null&&e.key!==SKEY&&e.key!==CKEY)return;
+  loadState();undo=null;syncUndo();syncInputs();render();
+});
+// 今日の日付、または表示している月の1日を、欄の日付に入れる(直している間は触らない)
+function syncDate(){
+  if(editId!=null)return;
+  const mo=$("month").value;if(!mo)return;
+  $("date").value=mo===thisMonth()?todayIso():mo+"-01";
+}
+// 月の欄を空にされたら、前の月に戻す(頭とカードが食い違わないように)
+$("month").addEventListener("change",()=>{
+  if(!$("month").value){$("month").value=lastMonth||thisMonth()}
+  monthChanged();syncDate();renderRead();render();
+});
+const prevMonth=(mo,d=-1)=>{const [y,m]=mo.split("-").map(Number),t=new Date(y,m-1+d,1);return t.getFullYear()+"-"+pad(t.getMonth()+1)};
+function shiftMonth(d){const cur=$("month").value||thisMonth();$("month").value=prevMonth(cur,d);monthChanged();syncDate();renderRead();render()}
+$("prevMonth").onclick=()=>shiftMonth(-1);$("nextMonth").onclick=()=>shiftMonth(1);
+$("thisMonthBtn").onclick=()=>{$("month").value=thisMonth();monthChanged();syncDate();renderRead();render()};
+// 発行日・期限を手で直したら、選んでいる月の分として覚える(空にしたら、その分は月末に戻る)
+for(const id of ["issue","due"])$(id).addEventListener("change",()=>{
+  const mo=$("month").value;$("dnote").textContent="";
+  if(MONTH_RE.test(mo)){
+    const e=cfg.dates[mo]=cfg.dates[mo]||{},v=$(id).value;
+    if(DATE_RE.test(v))e[id]=v;else delete e[id];
+    if(!e.issue&&!e.due)delete cfg.dates[mo];
+    saveCfg();
+  }
+  renderOut();
+});
+$("withPlan").addEventListener("change",renderOut);
+$("bank").addEventListener("input",()=>{if(DEMO)return;cfg.bank=$("bank").value;saveCfg();renderOut()});
+$("subject").addEventListener("input",()=>{if(DEMO)return;cfg.subject=$("subject").value;saveCfg();renderOut()});
+
+// ダミーを足す: 今のデータ・設定は変えない(無いものだけ足す)。同じ行は足さない。「元に戻す」で、行も設定も足す前に戻る
+function loadDummy(){
+  const [C1,C2]=DUMMY.c,[V1,V2]=DUMMY.s;
+  const has=rows.length>0||Object.keys(cfg.clients).length>0||Object.keys(cfg.priceHist).length>0;
+  if(has&&!confirm("今の入力に、ダミーの行("+C1+"・"+C2+")を足します。振込先・取引先コード・単価など、今の設定は変えません。よろしいですか?"))return 0;
+  const m=$("month").value||thisMonth(),before=snap(),beforeCfg=cloneCfg();let n=0;
+  const s=[[3,C1,V1,1.5,"09:00","10:30"],[10,C1,V1,2],[17,C1,V2,1],[5,C2,V1,1],[12,C2,V1,1.5]],newV2=!Object.hasOwn(cfg.priceHist,V2);
+  for(const [d,c,v,h,st,en] of s){
+    const r={id:Date.now()+Math.random(),date:m+"-"+pad(d),client:c,service:v,hours:h,kind:(c===C1||d<=10)?"act":"plan",...(st?{start:st,end:en}:{})};
+    if(!rows.some(x=>x.date===r.date&&x.client===c&&x.service===v&&x.hours===h&&x.kind===r.kind)){rows.push(r);n++}
+  }
+  [[C1,"DEMO1"],[C2,"DEMO2"]].forEach(([c,w])=>{if(!Object.hasOwn(cfg.clients,c))cfg.clients[c]={code:w,hon:"御中",reg:false}});
+  fixCfg(cfg);
+  for(const [v,p] of [[V1,3000],[V2,4000]])if(!(cfg.priceHist[v]||[]).length)setPrice(v,m,p);
+  if(!DEMO&&newV2)cfg.units[V2]="回"; // 実用版のダミー相談は「回」(1回ずつ)。デモ版は見本のCSVに合わせて、どちらも時間
+  if(!cfg.bank.trim())cfg.bank=DEMO_BANK;
+  syncInputs();store(CKEY,cfg);
+  const changed=!!n||JSON.stringify(cfg)!==JSON.stringify(beforeCfg);
+  if(changed)bulkStore("ダミーを入れた",before,beforeCfg);
+  notify(n?"ダミーの行を"+n+"件入れました。試し終わったら「ダミーを消す」を押してください。":"ダミーはもう入っています。",changed);
+  return n;
+}
+$("loadSample").onclick=()=>{loadDummy();render()};
+// ダミーを消す(実用版): ダミーの名前を使っている行と、ダミーの設定だけを消す。本物は消さない。元に戻すの状態に関係なく使える
+const isDummyRow=r=>DUMMY.c.includes(r.client)&&DUMMY.s.includes(r.service);
+function dummyCounts(){
+  return {rows:rows.filter(r=>DUMMY.c.includes(r.client)||DUMMY.s.includes(r.service)).length,
+    sets:DUMMY.c.filter(n=>Object.hasOwn(cfg.clients,n)).length+DUMMY.s.filter(n=>Object.hasOwn(cfg.priceHist,n)).length,
+    bank:normName(cfg.bank)===DEMO_BANK};
+}
+function clearDummy(){
+  if(DEMO)return 0;
+  const k=dummyCounts();if(!k.rows&&!k.sets)return 0;
+  if(!confirm("ダミーの名前("+DUMMY.c.concat(DUMMY.s).join("、")+")を使っている行 "+k.rows+"件と、ダミーの設定 "+k.sets+"件を消します。"+(k.bank?"振込先もダミーのままなので、空にします。":"")+"それ以外のデータは消しません。よろしいですか?"))return 0;
+  rows=rows.filter(r=>!(DUMMY.c.includes(r.client)||DUMMY.s.includes(r.service)));
+  for(const n of DUMMY.c)delete cfg.clients[n];
+  for(const n of DUMMY.s){delete cfg.prices[n];delete cfg.priceHist[n];delete cfg.itemReg[n];delete cfg.units[n];delete cfg.itemTax[n]}
+  if(k.bank)cfg.bank="";
+  syncInputs();saveRows();store(CKEY,cfg);
+  notify("ダミーの行 "+k.rows+"件と、ダミーの設定 "+k.sets+"件を消しました。");
+  return k.rows+k.sets;
+}
+$("clearDummy").onclick=()=>{clearDummy();render()};
+if(DEMO){$("clearDummy").hidden=true;$("clearNote").hidden=true;$("demoCsvNote").hidden=false;$("subject").readOnly=true}
+
+function monthRows(){return rows.filter(r=>ym(r.date)===$("month").value).sort((a,b)=>a.date.localeCompare(b.date))}
+function selected(){return monthRows().filter(r=>nameOk(r.client,r.service)&&($("withPlan").checked||r.kind==="act"))}
+function groups(){const g=dict();for(const r of selected())(g[r.client]??=[]).push(r);return g}
+// 取引先ごとの、この月の合計時間(実績と予定を分ける)
+function totals(){
+  const t=new Map();
+  // act / plan は時間の合計、actN / planN は回数の合計
+  for(const r of monthRows()){
+    const o=t.get(r.client)||{client:r.client,act:0,plan:0,actN:0,planN:0},k=(r.kind==="act"?"act":"plan")+(unitOf(r.service)==="回"?"N":"");
+    o[k]+=r.hours;t.set(r.client,o);
+  }
+  return [...t.values()];
+}
+// 時間と回数の両方があれば「4.5時間・3回」。どちらも0なら「0時間」
+const qtyStr=(h,n)=>h>0||n===0?fmt(h)+"時間"+(n>0?"・"+fmt(n)+"回":""):fmt(n)+"回";
+const totalText=x=>"実績 "+qtyStr(x.act,x.actN)+" / 予定 "+qtyStr(x.plan,x.planN);
+
+// 一括操作(予定を実績に・前の月を写す)。直前の1回分だけ「元に戻す」で戻せる
+const snap=()=>rows.map(r=>({...r}));
+// beforeCfg があれば、戻すときに設定(振込先・取引先コード・単価など)も戻す
+function bulkStore(label,before,beforeCfg=null){store(SKEY,rows);undo={label,rows:before,cfg:beforeCfg}}
+function undoLast(){
+  if(!undo)return false;
+  const u=undo;rows=u.rows;undo=null;store(SKEY,rows);
+  if(u.cfg){cfg=u.cfg;fixCfg(cfg);store(CKEY,cfg);syncInputs()}
+  return true;
+}
+function actAll(){
+  const t=monthRows().filter(r=>r.kind==="plan");
+  if(!t.length)return 0;
+  if(!confirm(t.length+"件の予定を実績にします。行っていない日が入っていないか、先に確かめてください"))return 0;
+  const before=snap();t.forEach(r=>r.kind="act");bulkStore("予定を実績にした",before);
+  notify(t.length+"件を実績にしました。",true);return t.length;
+}
+// 前の月の行を、「第n週の同じ曜日」に予定として写す。この月にその日が無い(第5週など)行は写さない
+function mirrorPlan(){
+  const cur=$("month").value;if(!cur)return null;
+  const [y,m]=cur.split("-").map(Number),dim=new Date(y,m,0).getDate(),fw=new Date(y,m-1,1).getDay(),out=[],have=new Set(monthRows().map(r=>r.date+"|"+r.client+"|"+r.service));let skip=0,dup=0;
+  for(const r of rows.filter(r=>ym(r.date)===prevMonth(cur))){
+    const d=new Date(r.date+"T00:00:00"),day=1+(d.getDay()-fw+7)%7+7*(Math.ceil(d.getDate()/7)-1);
+    if(day>dim){skip++;continue}
+    if(have.has(cur+"-"+pad(day)+"|"+r.client+"|"+r.service)){dup++;continue}
+    out.push({id:Date.now()+Math.random(),date:cur+"-"+pad(day),client:r.client,service:r.service,hours:r.hours,kind:"plan"});
+  }
+  return {out,skip,dup,exist:monthRows().length};
+}
+function copyPrev(){
+  const p=mirrorPlan();if(!p)return 0;
+  const tail="(写せない日 "+p.skip+"件"+(p.dup?"・この月にすでにある行 "+p.dup+"件":"")+")";
+  if(!p.out.length){notify("写せる行がありません"+tail+"。");return 0}
+  if(!confirm(p.out.length+"件を写します"+tail+"。この月にはすでに "+p.exist+"件あります"))return 0;
+  const before=snap();rows.push(...p.out);bulkStore("前の月を写した",before);
+  notify(p.out.length+"件を予定として写しました"+tail+"。",true);return p.out.length;
+}
+$("bulkAct").onclick=()=>{actAll();render()};
+$("copyPrev").onclick=()=>{copyPrev();render()};
+$("undoBtn").onclick=()=>{if(undoLast())notify("元に戻しました。");render()};
+
+// 名前の変更と削除(設定の表から)。行・取引先・単価の名前をいっしょに付け替える
+const usage=(kind,n)=>rows.filter(r=>r[kind]===n).length;
+const rekey=(o,a,b)=>{const n=dict();for(const k of Object.keys(o))n[k===a?b:k]=o[k];return n};
+// 品目の先登録: サービス名と、いま選んでいる月から先の単価を設定に足す
+function addItem(rawName,rawPrice,rawUnit="時間",rawKubun="",rawWh="なし"){
+  if(DEMO)return {ok:false,msg:"デモ版では、サービスは決まっているので、品目を追加できません。"};
+  const nn=normName(rawName),mo=$("month").value,ps=String(rawPrice??"").trim(),price=toPrice(ps);
+  if(!nn)return {ok:false,msg:"品目名を入れてください。"};
+  if(nameExists("service",nn))return {ok:false,msg:"「"+nn+"」はすでにあります。"};
+  if(ps!==""&&price==="")return {ok:false,msg:"単価は、0以上の数で入れてください。"};
+  if(price!==""&&!mo)return {ok:false,msg:"先に、上の「月」を選んでください。"};
+  const unit=UNITS.includes(rawUnit)?rawUnit:"時間";
+  cfg.priceHist[nn]=[];cfg.prices[nn]="";cfg.units[nn]=unit;
+  cfg.itemTax[nn]={kubun:KUBUN.includes(rawKubun)?rawKubun:"",wh:TAX_OPT.wh.includes(rawWh)?rawWh:"なし"};
+  if(price!=="")setPrice(nn,mo,price);
+  saveCfg();
+  return {ok:true,msg:"「"+nn+"」を追加しました(単位: "+unit+")"+(price!==""?"("+jaMonth(mo)+"から "+price.toLocaleString("ja-JP")+"円)":"(単価は未設定)")+"。"};
+}
+const nameExists=(kind,n)=>usage(kind,n)>0||(kind==="client"?Object.hasOwn(cfg.clients,n):Object.hasOwn(cfg.prices,n)||Object.hasOwn(cfg.priceHist,n));
+function renameName(kind,old,raw){
+  if(DEMO)return {ok:false,msg:"デモ版では、名前を変えられません。"};
+  const nn=normName(raw);
+  if(!nn||nn===old)return {ok:false,msg:""};
+  if(nameExists(kind,nn))return {ok:false,msg:"「"+nn+"」はすでにあります。別の名前にしてください(1つにまとめることはできません)。"};
+  const cnt=usage(kind,old);
+  rows=rows.map(r=>r[kind]===old?{...r,[kind]:nn}:r);
+  if(kind==="client")cfg.clients=rekey(cfg.clients,old,nn);else{cfg.prices=rekey(cfg.prices,old,nn);cfg.priceHist=rekey(cfg.priceHist,old,nn);cfg.itemReg=rekey(cfg.itemReg,old,nn);cfg.units=rekey(cfg.units,old,nn);cfg.itemTax=rekey(cfg.itemTax,old,nn)}
+  const inp=$(kind);if(normName(inp.value)===old)inp.value=nn;
+  saveRows();saveCfg();
+  return {ok:true,msg:"「"+old+"」を「"+nn+"」に変えました("+cnt+"行)。"};
+}
+// 品目の単位を変える。その品目を使っている行があれば、数量の意味が変わるので、行数を見せて確かめる
+function setUnit(s,unit){
+  if(!UNITS.includes(unit)||!Object.hasOwn(cfg.priceHist,s))return {ok:false,msg:""};
+  if(unitOf(s)===unit)return {ok:true,msg:""};
+  const n=usage("service",s);
+  if(n>0&&!confirm("この品目の"+n+"行の数量の意味が変わります(たとえば 1.5時間 が 1.5回 になります)。よろしいですか?"))return {ok:false,msg:""};
+  cfg.units[s]=unit;saveCfg();
+  return {ok:true,msg:"「"+s+"」の単位を「"+unit+"」にしました"+(n?"("+n+"行の数量の単位が変わりました)":"")+"。"};
+}
+function deleteName(kind,n){
+  const c=usage(kind,n);
+  if(c)return {ok:false,msg:"「"+n+"」は"+c+"行で使っているので、削除できません。"};
+  if(!confirm("「"+n+"」を設定から削除しますか?"))return {ok:false,msg:""};
+  if(kind==="client")delete cfg.clients[n];else{delete cfg.prices[n];delete cfg.priceHist[n];delete cfg.itemReg[n];delete cfg.units[n];delete cfg.itemTax[n]}
+  saveCfg();return {ok:true,msg:"「"+n+"」を削除しました。"};
+}
+
+function cell(tr,text,cls){const td=document.createElement("td");td.textContent=text;if(cls)td.className=cls;tr.append(td);return td}
+
+// ▼選ぶ の候補: 使った名前と設定にある名前(デモ版は決まった一覧)
+const candidates=()=>DEMO?{cl:DEMO_CLIENTS,sv:DEMO_SERVICES}:{cl:[...new Set([...rows.map(r=>r.client),...Object.keys(cfg.clients)])],sv:[...new Set([...rows.map(r=>r.service),...Object.keys(cfg.priceHist)])]};
+const scroll=t=>{const w=document.createElement("div");w.className="scroll";w.append(t);return w};
+function btn(text,fn,cls="btn btn-secondary btn-sm"){const b=document.createElement("button");b.type="button";b.className=cls;b.textContent=text;b.onclick=fn;return b}
+
+// 取引先の色: 設定の取引先の順に c1〜c4 をくり返す(色だけに頼らず、名前は必ず文字でも出す)
+const colorCls=n=>{const i=Object.keys(cfg.clients).indexOf(n);return "c"+(((i<0?0:i)%4)+1)};
+const dot=n=>{const d=el("span","who "+colorCls(n));d.setAttribute("aria-hidden","true");return d};
+// 数量の文字: 時間は「2時間」、回は「1回」。カードの中身は「作業サービス ・ 9:00〜11:00(2時間)」
+const qtyOf=r=>fmt(r.hours)+unitOf(r.service);
+const detailOf=r=>r.service+" ・ "+(unitOf(r.service)==="時間"&&hmRange(r)?hmRange(r)+"("+qtyOf(r)+")":qtyOf(r));
+// 合計の文字: 「5時間 + 1回」。何もなければ「なし」
+function sumText(list){
+  let h=0,n=0;
+  for(const r of list){if(unitOf(r.service)==="回")n+=r.hours;else h+=r.hours}
+  const p=[];if(h>0)p.push(fmt(h)+"時間");if(n>0)p.push(fmt(n)+"回");
+  return p.length?p.join(" + "):"なし";
+}
+// カードを押したあと、描き直された同じ行のカードの先頭のボタンへ、キーボードの位置を戻す
+function focusCard(id){
+  for(const box of ["planList","actList"])for(const c of Array.from($(box).children))if(c.dataset&&c.dataset.rid===String(id)){const b=c.querySelector("button");if(b&&typeof b.focus==="function")b.focus();return}
+}
+function cardOf(r){
+  const plan=r.kind!=="act",lb=rowLabel(r);
+  const a=el("article",plan?"card card-plan":"card");a.dataset.rid=String(r.id);
+  const nm=el("strong","cname");nm.append(dot(r.client),el("span","",r.client));
+  const foot=el("div","cfoot"),grp=el("div","grp");
+  const ed=btn("直す",()=>startEdit(r),"btn btn-text btn-text-sm");ed.setAttribute("aria-label",lb+" を直す");
+  const del=btn("削除",()=>askDelete(r.id,del),"btn btn-text btn-text-sm btn-text-del");del.setAttribute("aria-label",lb+" を削除");
+  grp.append(ed,del);
+  const sw=plan?btn("実績にする",()=>{setKind(r,"act");render();focusCard(r.id)}):btn("予定に戻す",()=>{setKind(r,"plan");render();focusCard(r.id)},"btn btn-text btn-text-sm");
+  sw.setAttribute("aria-label",lb+(plan?" を実績にする":" を予定に戻す"));
+  foot.append(sw,grp);
+  a.append(el("span","kicker",mdw(r.date)),nm,el("span","cdetail",detailOf(r)),foot);
+  return a;
+}
+const fillList=(box,list,none)=>box.replaceChildren(...(list.length?list.map(cardOf):[el("p","empty",none)]));
+// 1行で入れる欄の「押すと欄に入ります」ボタン(押すと、名前を1行の欄に差しこむ)
+function renderPicks(cl,sv){
+  const mk=(n,withDot)=>{const b=el("button","pick");b.type="button";if(withDot)b.append(dot(n));b.append(el("span","",n));b.onclick=()=>putWord(key(n));return b};
+  $("pickClients").replaceChildren(...cl.slice(0,8).map(n=>mk(n,true)));
+  $("pickServices").replaceChildren(...sv.slice(0,8).map(n=>mk(n,false)));
+}
+function putWord(w){
+  const q=$("q").value;$("q").value=(q&&!/\s$/.test(q)?q+" ":q)+w+" ";tried=false;$("q").removeAttribute("aria-invalid");renderRead();focusOn("q");
+}
+// 頭: 年・月、前の月・次の月の名前、今月に戻る、実績と予定の合計
+function renderHead(mr){
+  const mo=$("month").value||thisMonth(),[y,m]=mo.split("-").map(Number);
+  $("yearLabel").textContent=y+"年";$("monthNum").textContent=String(m);
+  const pn=+prevMonth(mo,-1).slice(5),nn=+prevMonth(mo,1).slice(5);
+  $("prevMonth").textContent="‹ "+pn+"月";$("prevMonth").setAttribute("aria-label","前の月("+pn+"月)");
+  $("nextMonth").textContent=nn+"月 ›";$("nextMonth").setAttribute("aria-label","次の月("+nn+"月)");
+  $("thisMonthBtn").hidden=mo===thisMonth();
+  $("sumAct").textContent=sumText(mr.filter(r=>r.kind==="act"));$("sumPlan").textContent=sumText(mr.filter(r=>r.kind!=="act"));
+}
+
+function render(){
+  ensureClients();
+  if(editId!=null&&!rows.some(r=>r.id===editId))endEdit();
+  const {cl,sv}=candidates();
+  fillPick("clientPick",cl,"選ぶ");fillPick("servicePick",sv,"選ぶ");renderPicks(cl,sv);
+  const mr=monthRows(),pl=mr.filter(r=>r.kind!=="act"),ac=mr.filter(r=>r.kind==="act");
+  fillList($("planList"),pl,"予定はありません。先の日付を入れると、ここに予定として入ります。");
+  fillList($("actList"),ac,"まだ実績はありません。");
+  $("planCount").textContent=pl.length+"件";$("actCount").textContent=ac.length+"件";
+  $("bulkAct").textContent=pl.length===1?"1件を実績にする":pl.length+"件とも実績にする";
+  $("bulkAct").disabled=!pl.length;$("bulkAct").hidden=!pl.length;
+  const mo=$("month").value;
+  const noPrev=!mo||!rows.some(r=>ym(r.date)===prevMonth(mo));
+  $("copyPrev").disabled=noPrev;$("copyPrevWhy").textContent=noPrev?"前の月に行がないので、写せません。":"";$("copyPrevWhy").hidden=!noPrev;
+  const dc=dummyCounts(),noDummy=!(dc.rows||dc.sets);
+  $("clearDummy").disabled=noDummy;$("clearWhy").textContent=noDummy?"消せるダミーがありません。":"";$("clearWhy").hidden=DEMO||!noDummy;
+  if($("month").value)lastMonth=$("month").value;
+  syncUndo();renderHead(mr);
+  updateQtyUI();
+  renderTotals();renderCfg();renderOut();
+}
+
+function renderTotals(){
+  const b=$("totals");b.replaceChildren();const T=totals();if(!T.length)return;
+  const h=document.createElement("h3"),ul=document.createElement("ul");h.textContent="取引先ごとの合計";
+  for(const x of T){const li=document.createElement("li");li.textContent=x.client+": "+totalText(x);ul.append(li)}
+  b.append(h,ul);
+}
+
+const doMsg=res=>{$("cmsg").textContent=res.msg;render()};
+function opsCell(kind,n){
+  const td=document.createElement("td"),used=usage(kind,n);
+  const ed=btn("編集",()=>kind==="client"?openClientDialog(n):openItemDialog(n));
+  const del=btn("削除",()=>doMsg(deleteName(kind,n)),"btn btn-danger btn-sm");
+  if(used){del.disabled=true;del.title="この名前を使っている行が"+used+"行あるので、削除できません"}
+  td.append(ed,del);
+  if(used){const s=document.createElement("div");s.className="hint";s.textContent="使用中("+used+"行)のため、削除できません";td.append(s)}
+  return td;
+}
+
+// 取引先・品目の表は、見るだけ(登録と編集は、「登録」「編集」で開く小さな画面で行う)
+function renderCfg(){
+  const c=$("cfgClients");c.replaceChildren();
+  const names=Object.keys(cfg.clients);
+  if(names.length){
+    const t=document.createElement("table");t.innerHTML="<tr><th>取引先</th><th>取引先コード</th><th>敬称</th><th>消費税の表示・端数処理</th><th>請求書ソフトに登録済み</th><th></th></tr>";
+    names.forEach(n=>{
+      const x=cfg.clients[n],tr=document.createElement("tr");
+      const nc=cell(tr,n);
+      if(!DEMO&&CFIELDS.some(k=>x[k])){const hd=document.createElement("div");hd.className="hint";hd.textContent="連絡先あり";nc.append(hd)}
+      cell(tr,outCode(n));cell(tr,x.hon);cell(tr,x.taxMode+"・"+x.round);cell(tr,x.reg?"✓":"");
+      tr.append(opsCell("client",n));t.append(tr);
+    });
+    c.append(scroll(t));
+  }
+  const p=$("cfgPrices");p.replaceChildren();
+  const sv=Object.keys(cfg.priceHist),mo=$("month").value;
+  if(sv.length){
+    const t=document.createElement("table");
+    t.innerHTML="<tr><th>品目</th><th>単価(この月)</th><th>単位</th><th>税区分</th><th>源泉徴収</th><th>請求書ソフトに登録済み</th><th></th></tr>";
+    sv.forEach(n=>{
+      const tr=document.createElement("tr"),it=itemTaxOf(n);
+      cell(tr,n);
+      const pc=cell(tr,yen(priceFor(n,mo)));
+      const hs=document.createElement("div");hs.className="hint";hs.textContent=histText(n);pc.append(hs);
+      cell(tr,unitOf(n));cell(tr,it.kubun||"10%");cell(tr,it.wh);cell(tr,cfg.itemReg[n]?"✓":"");
+      tr.append(opsCell("service",n));t.append(tr);
+    });
+    p.append(scroll(t));
+  }
+}
+
+// ---- 登録・編集の小さな画面(dialog) ----
+const dlgOrig={client:null,item:null};
+const showDlg=d=>{if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","")};
+const hideDlg=d=>{if(typeof d.close==="function")d.close();else d.removeAttribute("open")};
+const focusOn=id=>{const e=$(id);if(typeof e.focus==="function")e.focus()};
+// 新しい取引先コードの案内(番号は、登録するまで進めない)
+const peekCode=()=>{fixSeq(cfg);return "A"+pad(cfg.codeSeq+1,3)};
+const bad=msg=>({ok:false,msg});
+// 画面の欄と取引先の項目の対応
+const CMAP=[["cdRegNo","regNo"],["cdDept","dept"],["cdPerson","person"],["cdMail","mail"],["cdZip","zip"],["cdAddr","addr"],["cdBldg","bldg"],["cdTel","tel"],["cdFax","fax"]];
+// 入れ方の確かめ(保存はできる。気づいてもらうだけ)
+function contactWarnings(v){
+  const s=k=>String(v[k]??"").trim(),W=[];
+  if(s("regNo")&&!/^T\d{13}$/.test(s("regNo")))W.push("登録番号は、T と13桁の数字です(例: T1234567890123)。");
+  if(s("zip")&&!/^\d{3}-?\d{4}$/.test(s("zip")))W.push("郵便番号は、123-4567 の形で入れてください。");
+  if(s("mail")&&!s("mail").includes("@"))W.push("メールアドレスに @ がありません。");
+  if(s("tel")&&!/^[0-9-]+$/.test(s("tel")))W.push("TELは、数字とハイフンだけで入れてください。");
+  if(s("fax")&&!/^[0-9-]+$/.test(s("fax")))W.push("FAXは、数字とハイフンだけで入れてください。");
+  return W;
+}
+const clientVals=()=>{const v={name:$("cdName").value,code:$("cdCode").value,hon:$("cdHon").value,taxMode:$("cdMode").value,round:$("cdRound").value,reg:$("cdReg").checked};for(const [id,k] of CMAP)v[k]=$(id).value;return v};
+function clientWarn(){const W=contactWarnings(clientVals());$("cdWarn").textContent=W.length?"確かめてください(このまま保存もできます): "+W.join(""):""}
+function openClientDialog(n=null){
+  dlgOrig.client=n;const c=n?cfg.clients[n]:null;
+  $("cdTitle").textContent=n?"取引先を編集":"取引先を登録";$("cdSave").textContent=n?"保存":"登録";
+  $("cdName").value=n||"";$("cdName").readOnly=DEMO;$("cdCode").value=c?outCode(n):peekCode();
+  $("cdHon").value=c?c.hon:"御中";$("cdMode").value=c?c.taxMode:TAX_OPT.mode[0];$("cdRound").value=c?c.round:TAX_OPT.round[0];$("cdReg").checked=!!(c&&c.reg);
+  for(const [id,k] of CMAP)$(id).value=c&&!DEMO?c[k]:"";
+  // デモ版は、架空の取引先だけを扱うので、連絡先とコードは入れられない
+  if(DEMO){for(const [id] of CMAP)$(id).disabled=true;$("cdCode").readOnly=true;$("cdDemoNote").hidden=false}
+  $("cdMsg").textContent="";clientWarn();showDlg($("dlgClient"));focusOn(DEMO&&n?"cdHon":"cdName");
+}
+// v={name,code,hon,taxMode,round,reg}。orig は編集する取引先の名前(新しく登録するときは null)
+function saveClient(orig,v){
+  if(DEMO){v={...v,code:outCode(orig||normName(v.name))};for(const k of CFIELDS)v[k]=""}
+  const nn=normName(v.name),code=String(v.code??"").trim();
+  if(!nn)return bad("取引先名を入れてください。");
+  if(!code)return bad("取引先コードを入れてください。");
+  if(!orig){
+    if(DEMO)return bad("デモ版では、取引先は決まっているので、登録できません。");
+    if(nameExists("client",nn))return bad("「"+nn+"」はすでにあります。");
+  }else if(nn!==orig){
+    if(DEMO)return bad("デモ版では、名前を変えられません。");
+    if(nameExists("client",nn))return bad("「"+nn+"」はすでにあります。別の名前にしてください(1つにまとめることはできません)。");
+  }
+  for(const [k,x] of Object.entries(cfg.clients))if(k!==orig&&(x.code||"").trim()===code)return bad("取引先コード「"+code+"」は、ほかの取引先「"+k+"」が使っています。");
+  let msg="「"+nn+"」を"+(orig?"保存":"登録")+"しました。";
+  if(orig&&nn!==orig){const r=renameName("client",orig,nn);if(!r.ok)return r;msg=r.msg}
+  const e=cfg.clients[nn]||(cfg.clients[nn]={});
+  Object.assign(e,{code,hon:HONS.includes(v.hon)?v.hon:"御中",taxMode:TAX_OPT.mode.includes(v.taxMode)?v.taxMode:TAX_OPT.mode[0],round:TAX_OPT.round.includes(v.round)?v.round:TAX_OPT.round[0],reg:!!v.reg});
+  for(const k of CFIELDS)e[k]=String(v[k]??"").trim().slice(0,200);
+  delete e.deptPrint;delete e.personPrint;
+  saveCfg();
+  const W=contactWarnings(v);
+  return {ok:true,msg:msg+(W.length?"(確かめてください: "+W.join("")+")":"")};
+}
+function openItemDialog(n=null){
+  dlgOrig.item=n;const mo=$("month").value,it=n?itemTaxOf(n):{kubun:"",wh:"なし"};
+  $("itTitle").textContent=n?"品目を編集":"品目を登録";$("itSave").textContent=n?"保存":"登録";
+  $("itName").value=n||"";$("itName").readOnly=DEMO;$("itPrice").value=n?priceFor(n,mo):"";
+  $("itUnit").value=n?unitOf(n):"時間";$("itKubun").value=it.kubun;$("itWh").value=it.wh;$("itReg").checked=!!(n&&cfg.itemReg[n]);
+  $("itHist").textContent=n?histText(n):"";itemNote();
+  $("itMsg").textContent="";showDlg($("dlgItem"));focusOn(DEMO&&n?"itPrice":"itName");
+}
+const itemNote=()=>{const mo=$("month").value;$("itNote").textContent=mo?jaMonth(mo)+"から・円/"+$("itUnit").value+"(いま選んでいる月から先の単価になります)":""};
+// v={name,price,unit,kubun,wh,reg}
+function saveItem(orig,v){
+  const nn=normName(v.name),mo=$("month").value,ps=String(v.price??"").trim(),price=toPrice(ps);
+  const unit=UNITS.includes(v.unit)?v.unit:"時間",kubun=KUBUN.includes(v.kubun)?v.kubun:"",wh=TAX_OPT.wh.includes(v.wh)?v.wh:"なし";
+  if(!nn)return bad("品目名を入れてください。");
+  if(!orig){
+    if(DEMO)return bad("デモ版では、サービスは決まっているので、品目を登録できません。");
+    if(nameExists("service",nn))return bad("「"+nn+"」はすでにあります。");
+  }else if(nn!==orig){
+    if(DEMO)return bad("デモ版では、名前を変えられません。");
+    if(nameExists("service",nn))return bad("「"+nn+"」はすでにあります。別の名前にしてください(1つにまとめることはできません)。");
+  }
+  if(ps!==""&&price==="")return bad("単価は、0以上の数で入れてください。");
+  if(!orig){
+    const r=addItem(nn,ps,unit,kubun,wh);if(!r.ok)return r;
+    cfg.itemReg[nn]=!!v.reg;saveCfg();return {ok:true,msg:"「"+nn+"」を登録しました。"};
+  }
+  const cur=priceFor(orig,mo),np=ps===""?"":price;
+  if(np!==cur&&!mo)return bad("先に、上の「月」を選んでください。");
+  if(unit!==unitOf(orig)&&!setUnit(orig,unit).ok)return bad("単位は変えませんでした。もう一度確かめてください。");
+  let key=orig,msg="「"+nn+"」を保存しました。";
+  if(nn!==orig){const r=renameName("service",orig,nn);if(!r.ok)return r;key=nn;msg=r.msg}
+  if(np!==cur)setPrice(key,mo,np);
+  cfg.itemTax[key]={kubun,wh};cfg.itemReg[key]=!!v.reg;saveCfg();
+  return {ok:true,msg};
+}
+$("clientNew").onclick=()=>openClientDialog();$("itemNew").onclick=()=>openItemDialog();
+for(const [id] of CMAP)$(id).addEventListener("input",clientWarn);
+$("cdCancel").onclick=()=>hideDlg($("dlgClient"));$("itCancel").onclick=()=>hideDlg($("dlgItem"));
+$("itUnit").addEventListener("change",itemNote);
+$("cdSave").onclick=()=>{
+  const r=saveClient(dlgOrig.client,clientVals());
+  if(!r.ok){$("cdMsg").textContent=r.msg;return}
+  hideDlg($("dlgClient"));$("cmsg").textContent=r.msg;render();
+};
+$("itSave").onclick=()=>{
+  const r=saveItem(dlgOrig.item,{name:$("itName").value,price:$("itPrice").value,unit:$("itUnit").value,kubun:$("itKubun").value,wh:$("itWh").value,reg:$("itReg").checked});
+  if(!r.ok){$("itMsg").textContent=r.msg;return}
+  hideDlg($("dlgItem"));$("cmsg").textContent=r.msg;render();
+};
+
+// ================= 削除の確かめ(別窓) =================
+let delId=null;
+let delOpener=null;
+function askDelete(id,opener){
+  const r=rows.find(x=>x.id===id);if(!r)return false;
+  delId=id;delOpener=opener||null;
+  $("delBody").replaceChildren(el("span","",rowLabel(r)+" ・ "+detailOf(r)+" ・ "+kindName(r.kind)),el("br"),el("span","sub","削除した後も、すぐなら「元に戻す」で戻せます。"));
+  showDlg($("dlgDel"));return true;
+}
+// やめた時は、押した削除ボタンへ戻す。削除した時は、隣のカード(なければ列の見出し)へ移す。Esc で閉じた時も、削除ボタンへ戻す
+const focusEl=e=>{if(e&&typeof e.focus==="function")e.focus()};
+$("delCancel").onclick=()=>{const op=delOpener;delId=null;delOpener=null;hideDlg($("dlgDel"));focusEl(op)};
+$("delOk").onclick=()=>{
+  const id=delId;delId=null;delOpener=null;hideDlg($("dlgDel"));if(id===null)return;
+  const r=rows.find(x=>x.id===id),head=r&&r.kind==="act"?"actH":"planH",box=$(r&&r.kind==="act"?"actList":"planList");
+  const cards=Array.from(box.children),at=cards.findIndex(c=>c.dataset&&c.dataset.rid===String(id));
+  const nb=cards[at+1]||cards[at-1],nbId=nb&&nb.dataset?nb.dataset.rid:null;
+  if(deleteRow(id))render();
+  if(nbId!==null&&nbId!==undefined)focusCard(nbId);else focusEl($(head));
+};
+$("dlgDel").addEventListener("close",()=>{const op=delOpener;if(delId===null)return;delId=null;delOpener=null;focusEl(op)});
+
+// ================= カレンダー(別窓) =================
+let calSel=1,calFocus=0;
+const monthOf=()=>$("month").value||thisMonth();
+const WEEK="日月火水木金土";
+const calStart=()=>{calSel=monthOf()===thisMonth()?+todayIso().slice(8):1};
+function renderCal(){
+  const mo=monthOf(),[y,m]=mo.split("-").map(Number),days=new Date(y,m,0).getDate(),first=new Date(y,m-1,1).getDay();
+  if(calSel>days)calSel=days;
+  $("calTitle").textContent=y+"年"+m+"月";
+  $("calLegend").replaceChildren(...Object.keys(cfg.clients).slice(0,8).map(n=>{const s=el("span","lg");s.append(dot(n),el("span","",n));return s}));
+  const mr=rows.filter(r=>ym(r.date)===mo),kids=[];
+  for(const w of WEEK)kids.push(el("div","wk",w));
+  for(let i=0;i<first;i++){const b=el("div","c-blank");b.setAttribute("aria-hidden","true");kids.push(b)}
+  for(let d=1;d<=days;d++){
+    const date=mo+"-"+pad(d),day=mr.filter(r=>r.date===date),isToday=date===todayIso();
+    const b=el("button","cell"+(isToday?" c-today":"")+(d===calSel?" c-sel":""));b.type="button";
+    b.setAttribute("aria-label",m+"月"+d+"日 "+(day.length?day.length+"件 "+[...new Set(day.map(r=>r.client))].join("、"):"記録なし"));
+    b.setAttribute("aria-pressed",String(d===calSel));
+    if(isToday)b.setAttribute("aria-current","date");
+    b.append(el("span","dnum",String(d)));
+    for(const r of day.slice(0,3)){const c=el("span","cchip"+(r.kind==="act"?"":" cchip-plan"));c.append(dot(r.client),el("span","",baseName(r.client)+" "+r.service+" "+qtyOf(r)));b.append(c)}
+    if(day.length>3)b.append(el("span","cchip","ほか"+(day.length-3)+"件"));
+    b.onclick=()=>{calSel=d;calFocus=d;renderCal()};
+    kids.push(b);
+  }
+  $("calGrid").replaceChildren(...kids);
+  $("calSelTitle").textContent=m+"月"+calSel+"日("+WEEK[new Date(y,m-1,calSel).getDay()]+")";
+  const sr=mr.filter(r=>r.date===mo+"-"+pad(calSel));
+  $("calSelList").replaceChildren(...(sr.length?sr.map(r=>{const w=el("div","calrow"),s=el("strong");s.append(dot(r.client),el("span","",r.client));w.append(s,el("span","sub",detailOf(r)+" ・ "+kindName(r.kind)));return w}):[el("p","sub","この日の記録はありません。")]));
+  $("calAddDay").disabled=editId!=null;$("calAddReason").hidden=editId==null;
+  if(calFocus){const b=kids[7+first+calFocus-1];calFocus=0;if(b&&typeof b.focus==="function")b.focus()}
+}
+function openCal(){calStart();calFocus=0;renderCal();showDlg($("dlgCal"))}
+$("openCal").onclick=openCal;
+$("calClose").onclick=()=>hideDlg($("dlgCal"));
+$("calPrev").onclick=()=>{shiftMonth(-1);calStart();renderCal()};
+$("calNext").onclick=()=>{shiftMonth(1);calStart();renderCal()};
+// 背景(窓の外)を押したら閉じる。窓の内側の余白を押しても閉じない
+$("dlgCal").addEventListener("click",e=>{
+  const dlg=$("dlgCal");if(e.target!==dlg)return;
+  const r=dlg.getBoundingClientRect();
+  if(typeof e.clientX==="number"&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))hideDlg(dlg);
+});
+// この日に追加する: 窓を閉じて、今の入れ方の欄に日付を入れて移る
+$("calAddDay").onclick=()=>{
+  const date=monthOf()+"-"+pad(calSel);hideDlg($("dlgCal"));
+  if(mode==="line"){$("q").value=md(date)+" ";tried=false;$("q").removeAttribute("aria-invalid");renderRead();focusOn("q")}
+  else{$("date").value=date;focusOn("date")}
+};
+
+function problems(){
+  const g=groups(),P=[];
+  const names=Object.keys(g);
+  if(!names.length)return ["この月に出せる行がありません。行った日の予定は、「1 予定」のカードの「実績にする」を押して、実績にしてください"];
+  const sel=selected(),mo=$("month").value;
+  const np=sel.filter(r=>r.kind==="plan").length;
+  if(np)P.push("※ 予定の行が"+np+"件、請求書に入ります。行っていない日も請求されます。実績に切り替えるか、「予定も含める」を外してください");
+  const sv=new Set();names.forEach(n=>g[n].forEach(r=>sv.add(r.service)));
+  const noPrice=[...sv].filter(s=>priceFor(s,mo)==="");
+  if(noPrice.length)P.push("単価が未設定: "+noPrice.join("、"));
+  if(!outBank().trim())P.push("振込先が未入力です");
+  else if(!DEMO&&normName(cfg.bank)===DEMO_BANK&&sel.some(r=>!isDummyRow(r)))P.push("振込先が架空(ダミー)のままです。本物の振込先に変えてください");
+  // 取引先コードは、設定にあるすべての取引先の中で重ならないこと
+  const all=new Map();
+  for(const n of Object.keys(cfg.clients)){const k=outCode(n).trim();if(k){if(!all.has(k))all.set(k,[]);all.get(k).push(n)}}
+  const shown=new Set();
+  for(const n of names){
+    const c=outCode(n).trim();
+    if(!c)P.push("取引先コードが空: "+n);
+    else if(all.get(c).length>1&&!shown.has(c)){shown.add(c);P.push("取引先コードが重複: "+c+"("+all.get(c).join("、")+")")}
+  }
+  if(!$("issue").value||!$("due").value)P.push("発行日と支払期限を入れてください");
+  const zT=sel.filter(r=>unitOf(r.service)!=="回"&&!(r.hours>0)).length,zC=sel.filter(r=>unitOf(r.service)==="回"&&!(r.hours>0)).length;
+  if(zT)P.push("※ 時間が0の行が"+zT+"件、入っています。間違いでないか確かめてください");
+  if(zC)P.push("※ 回数が0の行が"+zC+"件、入っています。間違いでないか確かめてください");
+  const badC=sel.filter(r=>unitOf(r.service)==="回"&&r.hours>0&&!Number.isInteger(r.hours));
+  if(badC.length)P.push("回数が整数でない行があります: "+badC.map(r=>r.client+" "+md(r.date)+" "+r.service+"("+fmt(r.hours)+"回)").join("、")+"。カードの「直す」で直してください");
+  const seen=new Map(),dups=[];
+  for(const r of sel){const k=r.date+"|"+r.client+"|"+r.service;seen.set(k,(seen.get(k)||0)+1);if(seen.get(k)===2)dups.push(r.client+" "+md(r.date)+" "+r.service)}
+  if(dups.length)P.push("※ 同じ日・取引先・サービスの行が重なっています: "+dups.join("、")+"。二重に入れていないか確かめてください");
+  if(sel.some(r=>itemTaxOf(r.service).kubun))P.push("※ 8%(軽減)・非課税の品目があります。金額の目安は単価×数量で、税の金額は計算していません。税区分の列を見て、お使いの請求書ソフトや表計算で計算してください");
+  const fx=[...names,...sv].filter(formulaLike);
+  if(formulaLike(outSubject()))fx.push("件名");
+  if(formulaLike(outBank()))fx.push("振込先");
+  for(const n of Object.keys(cfg.clients))if(!cfg.clients[n].reg&&demoClient(n)&&CFIELDS.some(k=>formulaLike(outField(n,k))))fx.push(n+"の連絡先");
+  if(fx.length)P.push("※ 「"+fx.join("」「")+"」は、= + - @ のどれかで始まっています。表計算ソフトで数式として動くことがあります。必要なければ、頭の文字を変えてください");
+  const un=names.filter(n=>!cfg.clients[n].reg);
+  if(un.length)P.push("※ 請求書ソフトに未登録の取引先: "+un.join("、")+"。取引先CSVで登録できたら、設定の「請求書ソフトに登録済み」にチェックを入れてください");
+  return P;
+}
+const blocking=P=>P.filter(x=>!x.startsWith("※"));
+// 表計算ソフトで数式になりうる字で始まるか(= + - @)
+const formulaLike=v=>/^[=+\-@]/.test(normName(v));
+
+// 金額の目安: 単価×数量の合計。単価が未設定の品目があれば金額は出さない。税の表示・端数処理の設定は反映しない。税・源泉は計算しない
+function subtotal(rs){
+  const mo=$("month").value;let t=0;
+  for(const r of rs){const p=priceFor(r.service,mo);if(p==="")return {ok:false,text:"単価が未設定の品目があります"};t+=p*r.hours}
+  return {ok:true,value:Math.round(t),text:Math.round(t).toLocaleString("ja-JP")+"円"};
+}
+// 「3 書き出す」の列: 何件を何枚にまとめるか、取引先ごとの金額の目安と数量
+function renderBills(){
+  const g=groups(),names=Object.keys(g),sel=selected(),box=$("bills");
+  const na=sel.filter(r=>r.kind==="act").length,np=sel.length-na;
+  box.replaceChildren();
+  $("outSummary").textContent=!names.length?"この月に出せる行がありません。":(np?"実績の"+na+"件と予定の"+np+"件を":"実績の"+na+"件を")+"、取引先ごとに"+names.length+"枚の請求書にまとめます。"+(np?"予定も入ります。":"予定は入りません。");
+  if(!names.length)return;
+  box.append(el("p","kicker","金額の目安(単価×数量)"));
+  for(const n of names){
+    const st=subtotal(g[n]),row=el("div","bill"),nm=el("span","nm"),amt=el("span","amt");
+    nm.append(dot(n),el("span","",n));
+    amt.append(st.ok?el("strong","",st.text):el("span","sub",st.text),el("span","sub",sumText(g[n])));
+    row.append(nm,amt);box.append(row);
+  }
+}
+// 明細CSVのボタンの状態(上から順に決める)。本当のエラーは今どおり止める。それ以外は押せるままで、理由を見せる
+function csvState(){
+  const B=blocking(problems());
+  if(!monthRows().length)return {key:"empty",disabled:true,primary:false,cls:"reason",text:"記録を入れると、ここに請求書が出ます。"};
+  if(B.length)return {key:"block",disabled:true,primary:false,cls:"reason-err",text:"エラー: "+B[0].replace(/。$/,"")+(B.length>1?"(ほか"+(B.length-1)+"件)":"")+"。下の『CSVに書き出す(くわしく)』で確かめてください"};
+  const left=monthRows().filter(r=>r.kind!=="act").length;
+  if(left&&!$("withPlan").checked)return {key:"plan-left",disabled:false,primary:false,cls:"reason-strong",text:"まだ予定が"+left+"件あります。実績にしてから保存するのがおすすめです(予定は入りません)。"};
+  if(left)return {key:"plan-in",disabled:false,primary:false,cls:"reason-strong",text:"予定も"+left+"件、請求書に入ります。"};
+  return {key:"ready",disabled:false,primary:true,cls:"reason",text:"予定がすべて実績になりました。保存できます。"};
+}
+function renderCsv(){
+  const st=csvState();
+  $("dlInv").disabled=st.disabled;$("dlInv").className="btn "+(st.primary?"btn-primary":"btn-secondary")+" btn-block";
+  $("csvReason").className=st.cls;$("csvReason").textContent=st.text;
+}
+function renderOut(){
+  const g=groups(),[y,m]=$("month").value.split("-").map(Number);
+  let s="";
+  for(const [n,rs] of Object.entries(g)){
+    const c=cfg.clients[n]||{code:"",hon:"御中"};
+    s+="■ "+n+"("+outCode(n)+")  請求書番号 "+y+pad(m)+"-"+outCode(n)+"  "+taxLabel(n)+"\n";
+    let tot=0,cnt=0;
+    for(const r of rs){
+      const kai=unitOf(r.service)==="回",pr=priceFor(r.service,$("month").value);
+      if(kai)cnt+=r.hours;else tot+=r.hours;
+      s+="  "+mdw(r.date)+"  "+r.service+"  "+fmt(r.hours)+(kai?"回":"h")+(!kai&&hmRange(r)?" ("+hmRange(r)+")":"")+itemTaxNote(r.service)+(pr!==""&&pr!=null?" × "+Number(pr).toLocaleString("ja-JP"):"")+(r.kind==="plan"?" (予定)":"")+"\n"}
+    s+="  合計 "+(tot>0||cnt===0?fmt(tot)+" 時間":"")+(tot>0&&cnt>0?"・":"")+(cnt>0?fmt(cnt)+" 回":"")+"\n\n";
+  }
+  // 振込先・発行日・期限・税の設定を、いちばん上に出す(確かめやすいように)
+  $("out").value=s.trim()?"振込先: "+outBank()+"\n発行日: "+$("issue").value+"  支払期限: "+$("due").value+"\n\n"+s.trim():"";
+  const P=problems();
+  $("warn").replaceChildren(...P.map(x=>{const li=Object.assign(document.createElement("li"),{textContent:x,className:x.startsWith("※ 予定の行")?"strong":""});li.dataset.lv=x.startsWith("※")?"note":"block";return li}));
+  renderBills();renderCsv();
+  const unreg=Object.keys(cfg.clients).filter(n=>demoClient(n)&&!cfg.clients[n].reg);
+  $("dlCus").disabled=!unreg.length||unreg.some(n=>!outCode(n).trim());
+  $("dlItem").disabled=!itemList().length;
+  const why=[];
+  if(!unreg.length)why.push("取引先CSV: 請求書ソフトに未登録の取引先がないので、保存できません。");
+  else if($("dlCus").disabled)why.push("取引先CSV: 取引先コードが空の取引先があります。設定で入れてください。");
+  if($("dlItem").disabled)why.push("品目CSV: 請求書ソフトに未登録の品目がないので、保存できません。");
+  $("outBtnWhy").textContent=why.join("");$("outBtnWhy").hidden=!why.length;
+}
+
+const q=v=>{v=String(v??"");return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+
+// 明細CSV: 1つの記録=1行。請求書(取引先)ごと、日付の順。金額(目安)は 単価×数量(円未満は四捨五入)。税と源泉の金額は計算しない
+const KUBUN_OUT={"":"10%","8%(軽減)":"8%(軽減)","非課税":"非課税"};
+function invoiceCsv(){
+  const g=groups(),[y,m]=$("month").value.split("-").map(Number),mo=$("month").value;
+  const lines=[HDR_LINES.map(q).join(",")];
+  for(const [n,rs] of Object.entries(g)){
+    const c=cfg.clients[n],no=y+pad(m)+"-"+outCode(n),subj=(DEMO?"【デモ】":"")+outSubject().replaceAll("{y}",y).replaceAll("{m}",m);
+    for(const r of rs){
+      const p=priceFor(r.service,mo),it=itemTaxOf(r.service);
+      lines.push([no,$("issue").value,$("due").value,outCode(n),n,c.hon,subj,outBank(),r.date,r.service,fmt(r.hours),unitOf(r.service),r.start||"",r.end||"",p,p===""?"":Math.round(p*r.hours),KUBUN_OUT[it.kubun],it.wh,c.taxMode,c.round,r.kind==="act"?"実績":"予定"].map(q).join(","));
+    }
+  }
+  return BOM+lines.join("\r\n")+"\r\n";
+}
+
+function customerCsv(){
+  const lines=[HDR_CUS.map(q).join(",")];
+  // 先に登録しただけで行が無い取引先も出す(品目CSVと同じく、請求書ソフトに未登録の取引先すべて)
+  for(const n of Object.keys(cfg.clients)){
+    if(cfg.clients[n].reg||!demoClient(n))continue;
+    const c=cfg.clients[n],f=k=>outField(n,k);
+    lines.push([outCode(n),n,c.hon,c.taxMode,c.round,f("regNo"),f("person"),f("dept"),f("mail"),f("tel"),f("fax"),f("zip"),f("addr"),f("bldg")].map(q).join(","));
+  }
+  return BOM+lines.join("\r\n")+"\r\n";
+}
+
+// 品目CSV: 請求書ソフトに未登録の品目(サービス)すべて。単価は、いま選んでいる月の単価
+const itemList=()=>Object.keys(cfg.priceHist).filter(s=>(!DEMO||DEMO_SERVICES.includes(s))&&!cfg.itemReg[s]);
+function itemCsv(){
+  const mo=$("month").value;
+  return BOM+[HDR_ITEM,...itemList().map(s=>[s,priceFor(s,mo),unitOf(s),KUBUN_OUT[itemTaxOf(s).kubun],itemTaxOf(s).wh])].map(a=>a.map(q).join(",")).join("\r\n")+"\r\n";
+}
+
+function download(text,name){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type:"text/csv;charset=utf-8"}));
+  a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+const KINDS=["plan","act"];
+function buildBackup(){
+  return JSON.stringify({app:"seikyu-matome",version:1,savedAt:new Date().toISOString(),rows,cfg},null,1);
+}
+function parseBackup(text){
+  let o;try{o=JSON.parse(text)}catch(e){throw new Error("このアプリの控えではありません")}
+  if(!o||o.app!=="seikyu-matome"||o.version!==1||!Array.isArray(o.rows)||!o.cfg||typeof o.cfg!=="object")throw new Error("このアプリの控えではありません");
+  const str=v=>typeof v==="string"?v:"";
+  const R=o.rows.map((r,i)=>{
+    if(!r||!/^\d{4}-\d{2}-\d{2}$/.test(r.date)||typeof r.client!=="string"||!normName(r.client)||typeof r.service!=="string"||!normName(r.service)||typeof r.hours!=="number"||!isFinite(r.hours)||r.hours<0||!KINDS.includes(r.kind))
+      throw new Error((i+1)+"行目の内容が正しくありません");
+    const hm=v=>v===undefined||v===null||(typeof v==="string"&&HM_RE.test(v));
+    if(!hm(r.start)||!hm(r.end)||((r.start==null)!==(r.end==null))||(r.start!=null&&toMin(r.end)<=toMin(r.start)))throw new Error((i+1)+"行目の開始・終了が正しくありません");
+    if(!nameOk(normName(r.client),normName(r.service)))throw new Error("デモ版では、決まったダミーの取引先・サービスの控えしか戻せません("+(i+1)+"行目)");
+    return {id:Date.now()+Math.random()+i,date:r.date,client:normName(r.client),service:normName(r.service),hours:r.hours,kind:r.kind,...(r.start!=null?{start:r.start,end:r.end}:{})};
+  });
+  if(DEMO){
+    const bad=[...Object.keys(o.cfg.clients&&typeof o.cfg.clients==="object"?o.cfg.clients:{}).map(normName).filter(n=>!DEMO_CLIENTS.includes(n)),
+      ...["prices","priceHist","itemReg","units","itemTax"].flatMap(k=>Object.keys(o.cfg[k]&&typeof o.cfg[k]==="object"?o.cfg[k]:{}).map(normName).filter(n=>!DEMO_SERVICES.includes(n)))];
+    if(bad.length)throw new Error("デモ版では、決まったダミーの取引先・サービス以外を含む控えは戻せません(「"+bad[0]+"」)");
+  }
+  const C={clients:dict(),prices:dict(),bank:str(o.cfg.bank),subject:DEMO?DEMO_SUBJECT:str(o.cfg.subject)||"{y}年{m}月分 業務委託料"};
+  for(const [n,c] of Object.entries(o.cfg.clients||{})){const k=normName(n);if(!k||!c||typeof c!=="object"||k in C.clients)continue;C.clients[k]={code:str(c.code),hon:HONS.includes(mig("hon",c.hon))?mig("hon",c.hon):"御中",reg:!!c.reg,...Object.fromEntries(CFIELDS.map(k=>[k,c[k]])),wh:TAX_OPT.wh.includes(mig("wh",c.wh))?mig("wh",c.wh):undefined,taxMode:TAX_OPT.mode.includes(mig("mode",c.taxMode))?mig("mode",c.taxMode):undefined,round:TAX_OPT.round.includes(mig("round",c.round))?mig("round",c.round):undefined}}
+  for(const [n,p] of Object.entries(o.cfg.prices||{})){const k=normName(n);if(!k||k in C.prices)continue;C.prices[k]=(typeof p==="number"&&isFinite(p))?p:(typeof p==="string"?p:"")}
+  if(DEMO)for(const x of Object.values(C.clients)){for(const k of CFIELDS)x[k]="";x.code="DEMO"+(DEMO_CLIENTS.indexOf(Object.keys(C.clients).find(n=>C.clients[n]===x))+1)}
+  C.priceHist=o.cfg.priceHist;C.itemReg=o.cfg.itemReg;C.tax=o.cfg.tax;C.itemTax=o.cfg.itemTax;C.codeSeq=o.cfg.codeSeq;C.lastBank=o.cfg.lastBank;C.dates=o.cfg.dates;C.units=o.cfg.units;fixCfg(C,R);
+  const sd=typeof o.savedAt==="string"?new Date(o.savedAt):null;
+  return {rows:R,cfg:C,savedAt:sd&&!isNaN(sd)?iso(sd)+" "+pad(sd.getHours())+":"+pad(sd.getMinutes()):""};
+}
+$("dlBackup").onclick=()=>{
+  const d=new Date();
+  download(buildBackup(),"請求まとめ_控え_"+d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+".json");
+  $("bmsg").textContent="控えの保存を始めました。ブラウザのダウンロードを確かめてください。";
+};
+// 控えから戻す: 保存した日時と月の範囲を見せて確かめ、設定ごと「元に戻す」で戻せる
+function applyBackup(b){
+  const ms=b.rows.map(r=>ym(r.date)).sort(),range=ms.length?"、"+ms[0]+(ms.at(-1)!==ms[0]?"〜"+ms.at(-1):"")+"の分":"";
+  if(!confirm("今の入力("+rows.length+"行)を、控えの内容("+b.rows.length+"行"+range+(b.savedAt?"、保存した日時 "+b.savedAt:"")+")で置き換えます。置き換えた直後なら「元に戻す」で戻せます(設定を変えたり、開き直したりすると戻せません)。念のため、先に今の内容を「控えを保存」で残してください。よろしいですか?"))return false;
+  const before=snap(),beforeCfg=cloneCfg();
+  const seq=cfg.codeSeq;rows=b.rows;cfg=b.cfg;cfg.codeSeq=Math.max(cfg.codeSeq,seq);if(DEMO)cfg.bank=DEMO_BANK;
+  store(CKEY,cfg);bulkStore("控えから戻した",before,beforeCfg);syncInputs();render();
+  return true;
+}
+$("restore").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{
+    const b=parseBackup(await f.text());
+    if(applyBackup(b))$("bmsg").textContent="控えから戻しました("+rows.length+"行)。直後なら、お知らせの帯の「元に戻す」で戻せます。";
+  }catch(err){$("bmsg").textContent="戻せませんでした: "+err.message+"。今の入力は変わっていません。"}
+};
+// 明細CSVの保存: 振込先が前回と違うときは確かめる
+function saveInvoice(){
+  if(cfg.lastBank&&cfg.lastBank!==cfg.bank&&!confirm("振込先が前回("+cfg.lastBank+")から変わっています。このまま保存しますか?"))return false;
+  download(invoiceCsv(),"明細_"+$("month").value+".csv");
+  if(DEMO||normName(cfg.bank)!==DEMO_BANK)cfg.lastBank=cfg.bank;
+  store(CKEY,cfg);
+  $("msg").textContent="明細CSVの保存を始めました。ブラウザのダウンロードを確かめてください。";
+  notify("明細CSVの保存を始めました。ブラウザのダウンロードを確かめてください。");
+  return true;
+}
+$("dlInv").onclick=saveInvoice;
+$("dlCus").onclick=()=>{download(customerCsv(),"取引先_"+$("month").value+".csv");notify("取引先CSVの保存を始めました。ブラウザのダウンロードを確かめてください。");$("msg").textContent="取引先CSVの保存を始めました。ブラウザのダウンロードを確かめてください(請求書ソフトに未登録の取引先だけが入っています)。請求書ソフトに登録できたら、設定の「請求書ソフトに登録済み」にチェックを入れてください。"};
+$("dlItem").onclick=()=>{download(itemCsv(),"品目_"+$("month").value+".csv");notify("品目CSVの保存を始めました。ブラウザのダウンロードを確かめてください。");$("msg").textContent="品目CSVの保存を始めました。ブラウザのダウンロードを確かめてください(請求書ソフトに未登録の品目だけが入っています)。請求書ソフトに登録できたら、設定の「請求書ソフトに登録済み」にチェックを入れてください。"};
+if(DEMO){for(const id of ["clientNew","itemNew"])$(id).disabled=true;$("imsg").textContent="デモ版では、取引先とサービスは決まっているので、登録できません(中身の編集はできます)。"}
+setMode(mode,false);
+render();
+// 表示の色(ライト/ダーク/端末に合わせる)。アプリのデータとは別の保存場所に、これだけを覚える
+const THEME_KEY="seikyu-matome-theme-v1";
+function applyTheme(v){
+  if(!["light","dark","auto"].includes(v))v="auto";
+  const root=document.documentElement;
+  if(root){if(v==="auto")root.removeAttribute("data-theme");else root.setAttribute("data-theme",v)}
+  for(const [id,k] of [["themeLight","light"],["themeDark","dark"],["themeAuto","auto"]])$(id).setAttribute("aria-pressed",String(k===v));
+  return v;
+}
+function setTheme(v){v=applyTheme(v);try{localStorage.setItem(THEME_KEY,v)}catch(e){}return v}
+for(const [id,k] of [["themeLight","light"],["themeDark","dark"],["themeAuto","auto"]])$(id).onclick=()=>setTheme(k);
+{let v="auto";try{v=localStorage.getItem(THEME_KEY)||"auto"}catch(e){}applyTheme(v)}
+// ここまで読み込めたら、「プログラムが動いていません」の案内を隠す
+$("nojs").hidden=true;
+</script>
+</body>
+</html>
