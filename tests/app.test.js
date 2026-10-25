@@ -2984,7 +2984,15 @@ function publicFiles() {
   if (fs.existsSync(path.join(root, "README.md"))) {
     for (const f of ["README.md", "使い方とテスト手順.md", "AIへの頼み方.md"]) if (fs.existsSync(path.join(root, f))) list.push(f);
     const dir = path.join(root, "作り方一式");
-    if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir)) if (f.endsWith(".md")) list.push("作り方一式/" + f);
+    // 作り方一式は、チャット用/・Code用/・tools/ の中まで調べる(*.md と *.js)
+    const walk = (d, rel) => {
+      if (!fs.existsSync(d)) return;
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        if (e.isDirectory()) walk(path.join(d, e.name), rel + e.name + "/");
+        else if (e.name.endsWith(".md") || e.name.endsWith(".js")) list.push(rel + e.name);
+      }
+    };
+    walk(dir, "作り方一式/");
   }
   return list.map(f => [f, fs.readFileSync(path.join(root, f), "utf8")]);
 }
@@ -3009,4 +3017,16 @@ baseTest("作り方一式の仕様書: CSVの1行目(明細・取引先・品目
   const idx = fs.readFileSync(path.join(root, "index.html"), "utf8"), md = fs.readFileSync(spec, "utf8");
   const pick = name => vm.runInNewContext("[" + new RegExp("const " + name + "=\\[([^\\]]*)\\]").exec(idx)[1] + "]");
   for (const n of ["HDR_LINES", "HDR_CUS", "HDR_ITEM"]) assert.ok(md.includes(pick(n).join(",")), n + " の1行目が仕様書に無い");
+});
+baseTest("作り方一式の道具: check-headers.js が、index.html の見出しを仕様書と見本に照らして、飛ばし0件で通す。見本が無いときは失敗にする", () => {
+  const root = path.join(__dirname, "..");
+  const tool = path.join(root, "作り方一式", "tools", "check-headers.js");
+  if (!fs.existsSync(tool)) return; // 作業の元には無い
+  const cp = require("node:child_process");
+  const run = sample => cp.spawnSync(process.execPath, [tool, path.join(root, "index.html"), path.join(root, "作り方一式", "仕様書.md"), sample], { encoding: "utf8" });
+  const ok = run(path.join(root, "sample", "明細_見本_A社.csv"));
+  assert.equal(ok.status, 0, ok.stdout);
+  assert.match(ok.stdout, /飛ばし\(skipped\): 0件/);
+  const ng = run(path.join(root, "sample", "存在しない見本.csv"));
+  assert.notEqual(ng.status, 0, "見本が無いのに通ってしまいました");
 });
